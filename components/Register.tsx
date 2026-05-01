@@ -130,7 +130,8 @@ export function Register() {
                         </div>
 
                         <h1 className="text-2xl font-mm font-bold text-slate-900 tracking-wide mb-2">
-                            ရံပ်ရို; အီနံင်ဒါ (TIQR)
+                            (
+                            တီုင်စေတ်မေန်းတိုအီး TIQR)
                         </h1>
                         <p className="text-slate-500 text-sm font-medium flex justify-center items-center gap-1.5">
                             <ShieldCheck size={16} className="text-emerald-500" /> Identity Registration
