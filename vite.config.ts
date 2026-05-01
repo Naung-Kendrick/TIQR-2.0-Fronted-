@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'iLovePDF2-bg-removed.png', 'icon.ico'],
         manifest: {
           name: "TA'ANG LAND IMG TIQR",
           short_name: "TIQR System",
@@ -23,17 +23,17 @@ export default defineConfig(({ mode }) => {
           display: 'standalone',
           icons: [
             {
-              src: 'pwa-192x192.png',
+              src: 'iLovePDF2-bg-removed.png',
               sizes: '192x192',
               type: 'image/png'
             },
             {
-              src: 'pwa-512x512.png',
+              src: 'iLovePDF2-bg-removed.png',
               sizes: '512x512',
               type: 'image/png'
             },
             {
-              src: 'pwa-512x512.png',
+              src: 'iLovePDF2-bg-removed.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any maskable'
