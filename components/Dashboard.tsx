@@ -70,7 +70,7 @@ export default function Dashboard() {
         try {
             const token = localStorage.getItem('auth_token');
             if (!token) return;
-            const res = await fetch('/api/users/online', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/online`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -82,7 +82,7 @@ export default function Dashboard() {
         try {
             const token = localStorage.getItem('auth_token');
             if (!token) return;
-            await fetch('/api/users/heartbeat', {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/users/heartbeat`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
