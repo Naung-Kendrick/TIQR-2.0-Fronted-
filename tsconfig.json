@@ -15,8 +15,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vite/client"]
   },
-  "include": ["."],
+  "include": [".", "vite-env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
