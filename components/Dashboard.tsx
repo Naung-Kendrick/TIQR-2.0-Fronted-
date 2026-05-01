@@ -316,7 +316,14 @@ export default function Dashboard() {
     const selectedCount = selectedIds.size;
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-slate-200">
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-slate-200 relative">
+            {/* Fixed Version 2.0 Background Watermark */}
+            <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+                <div className="text-[15vw] font-black text-slate-900/[0.03] select-none whitespace-nowrap -rotate-12 tracking-tighter">
+                    VERSION 2.0
+                </div>
+            </div>
+
             <input
                 key={resetKey}
                 type="file"
@@ -326,16 +333,21 @@ export default function Dashboard() {
                 accept=".xlsx,.xls,.csv"
             />
 
-            <div className="max-w-[1600px] mx-auto p-6 md:p-8 lg:p-12">
+            <div className="max-w-[1600px] mx-auto p-6 md:p-8 lg:p-12 relative z-10">
                 {/* Header - Authoritative Look */}
                 <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-5">
-                        <div className="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-xl shadow-slate-900/10">
-                            <img src={logo} className="w-10 h-10 object-contain" alt="Logo" />
+                        <div className="inline-flex items-center justify-center p-1 rounded-2xl bg-gradient-to-b from-white to-transparent shadow-lg relative">
+                            {/* Animated glowing backdrop */}
+                            <div className="absolute inset-0 bg-emerald-400/20 blur-xl rounded-full animate-pulse" style={{ animationDuration: '3s' }} />
+
+                            <div className="bg-white p-3 rounded-[1rem] border border-slate-100 relative z-10 [perspective:1000px]">
+                                <img src={logo} className="w-12 h-12 object-contain drop-shadow-[0_4px_12px_rgba(16,185,129,0.2)] animate-spin-y" alt="Logo" />
+                            </div>
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 tracking-tight uppercase">
-                                တီုင်စေတ်မေန်းတိုအီး  <span className="text-slate-500">[TIQR SYSTEM]</span>
+                                တီုင်စေတ်မေန်းတိုအီး  <span className="text-slate-500">[TIQR CREATOR]</span>
                                 <span className="ml-2 px-1.5 py-0.5 bg-slate-900/5 text-slate-400 text-[8px] font-black rounded border border-slate-200 uppercase tracking-tighter">V 2.0.0</span>
                             </h1>
                             <p className="text-slate-500 text-xs font-bold flex items-center gap-2 mt-1 uppercase tracking-wider">
@@ -352,14 +364,14 @@ export default function Dashboard() {
                         <div className="relative" ref={onlineDropdownRef}>
                             <button
                                 onClick={() => setShowOnlineDropdown(!showOnlineDropdown)}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-sky-500/10 border border-sky-500/20 rounded-full hover:bg-sky-500/20 transition-all active:scale-95"
+                                className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full hover:bg-emerald-500/20 transition-all active:scale-95"
                             >
-                                <span className="w-1.5 h-1.5 bg-sky-500 rounded-full animate-pulse" />
-                                <Users size={12} className="text-sky-700" />
-                                <span className="text-[10px] font-black text-sky-700 uppercase tracking-widest">
+                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                <Users size={12} className="text-emerald-700" />
+                                <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">
                                     {onlineUsers.length} ONLINE
                                 </span>
-                                <ChevronDown size={10} className={`text-sky-600 transition-transform duration-200 ${showOnlineDropdown ? 'rotate-180' : ''}`} />
+                                <ChevronDown size={10} className={`text-emerald-600 transition-transform duration-200 ${showOnlineDropdown ? 'rotate-180' : ''}`} />
                             </button>
 
                             {showOnlineDropdown && (
@@ -368,7 +380,7 @@ export default function Dashboard() {
                                 >
                                     <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                                         <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <span className="w-1.5 h-1.5 bg-sky-500 rounded-full animate-pulse" />
+                                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                                             Who's Online Now
                                         </h3>
                                     </div>
@@ -391,7 +403,7 @@ export default function Dashboard() {
                                                             {user.township || 'Unknown'}
                                                         </p>
                                                     </div>
-                                                    <span className="w-2 h-2 bg-sky-500 rounded-full animate-pulse flex-shrink-0" />
+                                                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse flex-shrink-0" />
                                                 </div>
                                             ))
                                         )}
@@ -432,7 +444,7 @@ export default function Dashboard() {
                             <div className="w-20 h-20 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300 shadow-sm border border-slate-200">
                                 {isProcessing ? <Loader2 size={32} className="animate-spin text-slate-600" /> : <Upload size={32} />}
                             </div>
-                            <h2 className="text-xl font-bold text-slate-900 mb-2 uppercase tracking-tight">Import Identity Database</h2>
+                            <h2 className="text-xl font-bold text-slate-900 mb-2 uppercase tracking-tight">Import Excel Database</h2>
                             <p className="text-slate-500 text-xs font-medium mb-8 text-center max-w-xs uppercase tracking-wide">ဘိူန်းဟံပ်လိူည် Excel (.xlsx) ကာည်း CSV (.csv)</p>
                             <div className="flex gap-3">
                                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg text-[10px] font-bold uppercase text-slate-600 tracking-wider">
@@ -478,7 +490,7 @@ export default function Dashboard() {
                                     <button
                                         onClick={toggleSelectionMode}
                                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black transition-all shadow-sm active:scale-95 whitespace-nowrap uppercase tracking-widest border ${selectionMode
-                                            ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                                             : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
                                             }`}
                                     >
@@ -510,17 +522,17 @@ export default function Dashboard() {
 
                             {/* Download Progress Bar */}
                             {isDownloading && (
-                                <div className="bg-white border border-blue-200 rounded-xl p-4 shadow-sm animate-in fade-in duration-200">
+                                <div className="bg-white border border-emerald-200 rounded-xl p-4 shadow-sm animate-in fade-in duration-200">
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider flex items-center gap-2">
+                                        <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider flex items-center gap-2">
                                             <Loader2 size={14} className="animate-spin" />
                                             Generating QR codes...
                                         </span>
-                                        <span className="text-[11px] font-black text-blue-600">{downloadProgress}%</span>
+                                        <span className="text-[11px] font-black text-emerald-600">{downloadProgress}%</span>
                                     </div>
-                                    <div className="w-full bg-blue-100 rounded-full h-2 overflow-hidden">
+                                    <div className="w-full bg-emerald-100 rounded-full h-2 overflow-hidden">
                                         <div
-                                            className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300 ease-out"
+                                            className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2 rounded-full transition-all duration-300 ease-out"
                                             style={{ width: `${downloadProgress}%` }}
                                         />
                                     </div>
@@ -577,10 +589,10 @@ export default function Dashboard() {
                     style={{ animation: 'slideUp 0.3s ease-out' }}
                 >
                     <div className="max-w-[1200px] mx-auto pointer-events-auto">
-                        <div className="bg-white/95 backdrop-blur-xl border border-blue-200 p-3 px-5 rounded-2xl shadow-2xl shadow-blue-900/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="bg-white/95 backdrop-blur-xl border border-emerald-200 p-3 px-5 rounded-2xl shadow-2xl shadow-emerald-900/10 flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
                                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all duration-200 ${selectedCount > 0
-                                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+                                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
                                     : 'bg-slate-100 text-slate-500 border border-slate-200'
                                     }`}>
                                     <PackageCheck size={14} />
@@ -593,7 +605,7 @@ export default function Dashboard() {
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={selectAll}
-                                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-blue-600 rounded-lg text-[10px] font-black hover:bg-blue-500 hover:text-white transition-all border border-blue-200 hover:border-blue-500 active:scale-95 uppercase tracking-widest"
+                                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-emerald-600 rounded-lg text-[10px] font-black hover:bg-emerald-500 hover:text-white transition-all border border-emerald-200 hover:border-emerald-500 active:scale-95 uppercase tracking-widest"
                                 >
                                     <CheckSquare size={12} /> SELECT ALL
                                 </button>
@@ -606,7 +618,7 @@ export default function Dashboard() {
                                 <button
                                     onClick={handleBulkDownload}
                                     disabled={selectedCount === 0 || isDownloading}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 active:scale-95 uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-black hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/30 active:scale-95 uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                                 >
                                     {isDownloading ? (
                                         <>

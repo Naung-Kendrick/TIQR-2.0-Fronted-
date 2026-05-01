@@ -92,7 +92,7 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                 onClick={handleCardClick}
                 className={`group bg-white rounded-xl border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden h-full ${
                     isSelected
-                        ? 'border-blue-400 ring-2 ring-blue-400/30 shadow-blue-100'
+                        ? 'border-emerald-400 ring-2 ring-emerald-400/30 shadow-emerald-100'
                         : 'border-slate-200'
                 } ${selectionMode ? 'cursor-pointer' : ''}`}
             >
@@ -108,8 +108,8 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                         <div
                             className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all duration-200 ${
                                 isSelected
-                                    ? 'bg-blue-500 border-blue-500 scale-110 shadow-lg shadow-blue-500/30'
-                                    : 'bg-white/90 border-slate-300 hover:border-blue-400 hover:bg-blue-50 backdrop-blur-sm'
+                                    ? 'bg-emerald-500 border-emerald-500 scale-110 shadow-lg shadow-emerald-500/30'
+                                    : 'bg-white/90 border-slate-300 hover:border-emerald-400 hover:bg-emerald-50 backdrop-blur-sm'
                             }`}
                         >
                             {isSelected && (
@@ -121,7 +121,7 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
 
                 {/* Selected overlay glow */}
                 {isSelected && (
-                    <div className="absolute inset-0 bg-blue-500/[0.03] pointer-events-none z-0" />
+                    <div className="absolute inset-0 bg-emerald-500/[0.03] pointer-events-none z-0" />
                 )}
 
                 {/* Authenticity Watermark - Guilloche Style */}

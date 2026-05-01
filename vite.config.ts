@@ -48,7 +48,11 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: 'http://localhost:3000',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          bypass: (req) => {
+            if (req.url && req.url.includes('.ts')) {
+              return req.url;
+            }
+          }
         }
       }
     },
