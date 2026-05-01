@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, ArrowRight, Lock, User } from 'lucide-react';
 import { SuccessModal } from './SuccessModal';
+import { makeApiUrl } from '../api/config';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
@@ -29,7 +30,7 @@ export function Login() {
         }
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/login`, {
+            const response = await fetch(makeApiUrl('/api/users/login'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserRole, StatusState } from '../types';
+import { makeApiUrl } from '../api/config';
 
 export default function AdminDashboard() {
     const [users, setUsers] = useState<User[]>([]);
@@ -49,7 +50,7 @@ export default function AdminDashboard() {
         setIsLoading(true);
         try {
             const token = localStorage.getItem('auth_token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
+            const response = await fetch(makeApiUrl('/api/users'), {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -75,7 +76,7 @@ export default function AdminDashboard() {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/update-role`, {
+            const response = await fetch(makeApiUrl('/api/users/update-role'), {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ export default function AdminDashboard() {
     const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
         try {
             const token = localStorage.getItem('auth_token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/update-status`, {
+            const response = await fetch(makeApiUrl('/api/users/update-status'), {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ export default function AdminDashboard() {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`, {
+            const response = await fetch(makeApiUrl(`/api/users/${userId}`), {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -152,7 +153,7 @@ export default function AdminDashboard() {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/update-pwd-admin`, {
+            const response = await fetch(makeApiUrl('/api/users/update-pwd-admin'), {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
