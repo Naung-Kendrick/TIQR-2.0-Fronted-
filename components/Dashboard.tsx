@@ -28,7 +28,7 @@ import { WeatherClock } from './WeatherClock';
 import { DataRow, StatusState, OnlineUser } from '../types';
 import { makeApiUrl } from '../api/config';
 
-const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
+const DEFAULT_LOGO_URL = "/logo.png";
 
 const WeatherBackground: React.FC<{ code: number | null }> = ({ code }) => {
     if (code === null) return null;
