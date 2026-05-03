@@ -23,8 +23,9 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
         const qrRef = useRef<HTMLDivElement>(null);
         const [isCopied, setIsCopied] = useState(false);
 
-        // Construct QR Data
+        // Construct QR Data (skip columns with no data)
         const qrValue = selectedQRColumns
+            .filter(col => row[col] !== undefined && row[col] !== null && String(row[col]).trim() !== '')
             .map(col => `${col}:${row[col]}`)
             .join('|');
 

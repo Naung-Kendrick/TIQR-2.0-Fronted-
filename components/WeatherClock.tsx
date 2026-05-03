@@ -58,7 +58,11 @@ const getWeatherIcon = (code: number, size: number = 16) => {
     return <Sun size={size} className="text-amber-400" />;
 };
 
-export const WeatherClock: React.FC = () => {
+export interface WeatherClockProps {
+    onWeatherChange?: (weatherCode: number) => void;
+}
+
+export const WeatherClock: React.FC<WeatherClockProps> = ({ onWeatherChange }) => {
     const [time, setTime] = useState(new Date());
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [location, setLocation] = useState('Namhsan');
@@ -86,6 +90,7 @@ export const WeatherClock: React.FC = () => {
                         humidity: data.current.relative_humidity_2m,
                         isDay: data.current.is_day === 1,
                     });
+                    onWeatherChange?.(data.current.weather_code);
                 }
             } catch (err) {
                 console.error('Weather fetch failed:', err);

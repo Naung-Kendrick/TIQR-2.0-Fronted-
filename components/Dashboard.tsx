@@ -16,7 +16,8 @@ import {
     PackageCheck,
     Users,
     MapPin,
-    ChevronDown
+    ChevronDown,
+    Clock
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -29,9 +30,91 @@ import { makeApiUrl } from '../api/config';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
+const WeatherBackground: React.FC<{ code: number | null }> = ({ code }) => {
+    if (code === null) return null;
+    const isSunny = code === 0 || code === 1;
+    const isCloudy = code === 2 || code === 3;
+    const isFog = code === 45 || code === 48;
+    const isRain = (code >= 51 && code <= 65) || (code >= 80 && code <= 82);
+    const isSnow = code >= 71 && code <= 75;
+    const isThunder = code >= 95;
+
+    return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+            {isSunny && (
+                <>
+                    <div className="absolute top-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-emerald-400/30 rounded-full blur-[100px] animate-[pulse_6s_ease-in-out_infinite]" />
+                    <div className="absolute bottom-[-10%] left-[-5%] w-[60vw] h-[60vw] bg-emerald-300/20 rounded-full blur-[120px] animate-[pulse_8s_ease-in-out_infinite_reverse]" />
+                </>
+            )}
+            {isCloudy && (
+                <>
+                    <div className="absolute top-[5%] left-[5%] w-[70vw] h-[30vw] bg-emerald-600/10 rounded-[100%] blur-[100px]" style={{ animation: 'floatCloud 12s ease-in-out infinite' }} />
+                    <div className="absolute top-[35%] right-[5%] w-[60vw] h-[25vw] bg-slate-400/20 rounded-[100%] blur-[100px]" style={{ animation: 'floatCloud 18s ease-in-out infinite reverse' }} />
+                    <div className="absolute bottom-[10%] left-[20%] w-[50vw] h-[20vw] bg-emerald-500/15 rounded-[100%] blur-[90px]" style={{ animation: 'floatCloud 15s ease-in-out infinite' }} />
+                    <style>{`@keyframes floatCloud { 0%, 100% { transform: translateX(0) scale(1); } 50% { transform: translateX(8%) scale(1.05); } }`}</style>
+                </>
+            )}
+            {isFog && (
+                <>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-100/40 to-slate-200/60 backdrop-blur-[4px]" />
+                    <div className="absolute bottom-0 left-[-50%] w-[200%] h-[60%] bg-emerald-50/40 blur-[60px]" style={{ animation: 'driftFog 15s linear infinite' }} />
+                    <div className="absolute top-[20%] left-[-50%] w-[200%] h-[40%] bg-slate-100/30 blur-[50px]" style={{ animation: 'driftFog 20s linear infinite reverse' }} />
+                    <style>{`@keyframes driftFog { 0% { transform: translateX(0); } 50% { transform: translateX(10%); } 100% { transform: translateX(0); } }`}</style>
+                </>
+            )}
+            {isRain && (
+                <>
+                    <div className="absolute inset-0 flex justify-around bg-slate-900/5 backdrop-blur-[1px]">
+                        {[...Array(40)].map((_, i) => (
+                            <div key={i} className="w-[2px] h-[30vh] bg-gradient-to-b from-transparent via-emerald-500/40 to-transparent" style={{ animation: `fallRain ${0.4 + Math.random() * 0.4}s linear infinite`, animationDelay: `${Math.random() * 2}s` }} />
+                        ))}
+                    </div>
+                    <style>{`@keyframes fallRain { 0% { transform: translateY(-100vh); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }`}</style>
+                </>
+            )}
+            {isSnow && (
+                <>
+                    <div className="absolute inset-0 flex justify-around bg-slate-900/5 backdrop-blur-[1px]">
+                        {[...Array(50)].map((_, i) => (
+                            <div key={i} className="w-3 h-3 bg-emerald-400/60 rounded-full blur-[2px]" style={{ animation: `fallSnow ${3 + Math.random() * 4}s linear infinite`, animationDelay: `${Math.random() * 5}s`, marginLeft: `${(Math.random() - 0.5) * 100}px` }} />
+                        ))}
+                    </div>
+                    <style>{`@keyframes fallSnow { 0% { transform: translateY(-10vh) translateX(0) scale(0.5); opacity: 0; } 20% { opacity: 1; transform: translateY(20vh) translateX(${Math.random() > 0.5 ? 20 : -20}px) scale(1); } 100% { transform: translateY(100vh) translateX(${Math.random() > 0.5 ? 50 : -50}px) scale(0.5); opacity: 0; } }`}</style>
+                </>
+            )}
+            {isThunder && (
+                <>
+                    <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[2px]">
+                        <div className="absolute inset-0 bg-emerald-400/30 mix-blend-overlay" style={{ animation: 'thunderFlash 5s infinite' }} />
+                        <div className="absolute top-[10%] left-[20%] w-[40vw] h-[40vw] bg-emerald-500/20 rounded-full blur-[100px]" style={{ animation: 'thunderFlash 7s infinite reverse' }} />
+                    </div>
+                    <style>{`@keyframes thunderFlash { 0%, 92%, 96%, 100% { opacity: 0; } 93%, 97% { opacity: 1; } }`}</style>
+                </>
+            )}
+        </div>
+    );
+};
+
+const formatTimeAgo = (dateString: string) => {
+    if (!dateString) return 'just now';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'just now';
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
+};
+
 export default function Dashboard() {
     const userRole = localStorage.getItem('auth_role') || 'admin';
 
+    const [weatherCode, setWeatherCode] = useState<number | null>(null);
     const [data, setData] = useState<DataRow[]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
@@ -324,6 +407,8 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            <WeatherBackground code={weatherCode} />
+
             <input
                 key={resetKey}
                 type="file"
@@ -348,16 +433,16 @@ export default function Dashboard() {
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 tracking-tight uppercase">
                                 တီုင်စေတ်မေန်းတိုအီး  <span className="text-slate-500">[TIQR CREATOR]</span>
-                                <span className="ml-2 px-1.5 py-0.5 bg-slate-900/5 text-slate-400 text-[8px] font-black rounded border border-slate-200 uppercase tracking-tighter">V 2.0.0</span>
+                                <span className="ml-2 px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 text-[8px] font-black rounded border border-emerald-200 uppercase tracking-tighter">V 2.0.0</span>
                             </h1>
                             <p className="text-slate-500 text-xs font-bold flex items-center gap-2 mt-1 uppercase tracking-wider">
-                                <ShieldCheck size={12} className="text-emerald-600" /> powered By Mai San Hlu & Mai Nay Lin
+                                <ShieldCheck size={12} className="text-emerald-600" /> powered By <span className="text-emerald-600">Mai San Hlu & Mai Nay Lin</span>
                             </p>
                         </div>
                     </div>
 
                     {/* Center: Weather & Clock */}
-                    <WeatherClock />
+                    <WeatherClock onWeatherChange={setWeatherCode} />
 
                     <div className="min-h-[40px] flex items-center gap-3">
                         {/* Who's Online */}
@@ -401,6 +486,9 @@ export default function Dashboard() {
                                                         <p className="text-[10px] text-slate-400 font-medium flex items-center gap-1 mt-0.5">
                                                             <MapPin size={9} />
                                                             {user.township || 'Unknown'}
+                                                            <span className="mx-1 opacity-50">•</span>
+                                                            <Clock size={9} />
+                                                            {formatTimeAgo(user.lastSeen)}
                                                         </p>
                                                     </div>
                                                     <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse flex-shrink-0" />
