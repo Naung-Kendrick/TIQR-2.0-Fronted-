@@ -4,7 +4,7 @@ import { ShieldCheck, ArrowRight, Lock, User as UserIcon, Mail, Phone, MapPin } 
 import { SuccessModal } from './SuccessModal';
 import { makeApiUrl } from '../api/config';
 
-const DEFAULT_LOGO_URL = "/logo.png";
+const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
 const LaserBackground = () => {
     const lasers = Array.from({ length: 15 }).map((_, i) => {
@@ -265,9 +265,6 @@ export function Register() {
                             </p>
                             <p className="text-emerald-600/60 text-[9px] font-black uppercase tracking-[0.3em]">
                                 VERSION V 2.0.0
-                            </p>
-                            <p className="text-slate-400 text-[8px] font-bold uppercase tracking-wider mt-2 opacity-60">
-                                Powered By Mai San Hlu & Mai Nay Lin
                             </p>
                         </div>
                     </div>
