@@ -39,6 +39,21 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
             || titleField;
 
         const getFileName = () => {
+            // Find the ID field (e.g., "ID NO", "ID", "ID Number")
+            const idField = selectedColumns.find(col => 
+                col.toLowerCase() === 'id no' || 
+                col.toLowerCase() === 'id' || 
+                col.toLowerCase() === 'id number'
+            );
+
+            const idValue = idField ? String(row[idField] || '').trim() : '';
+
+            if (idValue) {
+                // Remove "No - " prefix if present in the data
+                const cleanedId = idValue.replace(/^No\s*-\s*/i, '');
+                return `${cleanedId.replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ')}.png`;
+            }
+
             const name = String(row[nameField] || '').trim();
             if (name) {
                 return `${name.replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ')}.png`;
