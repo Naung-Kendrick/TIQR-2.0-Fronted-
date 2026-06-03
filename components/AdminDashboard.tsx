@@ -10,12 +10,14 @@ import {
     AlertCircle,
     Loader2,
     ShieldCheck,
+    Gauge,
     Mail,
     Phone,
     Calendar,
     Power,
     MapPin,
-    Clock
+    Clock,
+    TrendingUp
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserRole, StatusState } from '../types';
@@ -39,6 +41,9 @@ export default function AdminDashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [status, setStatus] = useState<StatusState>({ message: '', type: '' });
     const [currentUserRole, setCurrentUserRole] = useState<UserRole>(UserRole.USER);
+    const [loginLimitModal, setLoginLimitModal] = useState<{ isOpen: boolean; userId: string; currentLimit: number; newLimit: string }>({ isOpen: false, userId: '', currentLimit: 0, newLimit: '' });
+    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; userId: string }>({ isOpen: false, userId: '' });
+    const [passwordModal, setPasswordModal] = useState<{ isOpen: boolean; userId: string; newPassword: string }>({ isOpen: false, userId: '', newPassword: '' });
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -133,17 +138,22 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleDeleteUser = async (userId: string) => {
+    const handleOpenDeleteModal = (userId: string) => {
         if (currentUserRole !== UserRole.ROOT_ADMIN) {
             showStatus('Only Root Admin can delete users', 'error');
             return;
         }
+        setDeleteModal({ isOpen: true, userId });
+    };
 
-        if (!window.confirm('Are you sure you want to delete this user?')) return;
+    const handleCloseDeleteModal = () => {
+        setDeleteModal({ isOpen: false, userId: '' });
+    };
 
+    const handleConfirmDelete = async () => {
         try {
             const token = localStorage.getItem('auth_token');
-            const response = await fetch(makeApiUrl(`/api/users/${userId}`), {
+            const response = await fetch(makeApiUrl(`/api/users/${deleteModal.userId}`), {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -152,6 +162,7 @@ export default function AdminDashboard() {
             const data = await response.json();
             if (data.success) {
                 showStatus('User deleted successfully', 'success');
+                handleCloseDeleteModal();
                 fetchUsers();
             } else {
                 showStatus(data.message || 'Failed to delete user', 'error');
@@ -161,9 +172,19 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleResetPassword = async (userId: string) => {
-        const newPassword = window.prompt('Enter new password for this user:');
-        if (!newPassword) return;
+    const handleOpenPasswordModal = (userId: string) => {
+        setPasswordModal({ isOpen: true, userId, newPassword: '' });
+    };
+
+    const handleClosePasswordModal = () => {
+        setPasswordModal({ isOpen: false, userId: '', newPassword: '' });
+    };
+
+    const handleSavePassword = async () => {
+        if (!passwordModal.newPassword || passwordModal.newPassword.length < 6) {
+            showStatus('Password must be at least 6 characters', 'error');
+            return;
+        }
 
         try {
             const token = localStorage.getItem('auth_token');
@@ -173,16 +194,60 @@ export default function AdminDashboard() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ userId, newPassword })
+                body: JSON.stringify({ userId: passwordModal.userId, newPassword: passwordModal.newPassword })
             });
             const data = await response.json();
             if (data.success) {
                 showStatus('Password reset successfully', 'success');
+                handleClosePasswordModal();
             } else {
                 showStatus(data.message || 'Failed to reset password', 'error');
             }
         } catch (err) {
             showStatus('Error resetting password', 'error');
+        }
+    };
+
+    const handleOpenLoginLimitModal = (userId: string, currentLimit: number | undefined) => {
+        setLoginLimitModal({
+            isOpen: true,
+            userId,
+            currentLimit: currentLimit || 0,
+            newLimit: (currentLimit || 0).toString()
+        });
+    };
+
+    const handleCloseLoginLimitModal = () => {
+        setLoginLimitModal({ isOpen: false, userId: '', currentLimit: 0, newLimit: '' });
+    };
+
+    const handleSaveLoginLimit = async () => {
+        const newLimit = parseInt(loginLimitModal.newLimit);
+        if (isNaN(newLimit) || newLimit < 0) {
+            showStatus('Please enter a valid number (0 or greater)', 'error');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch(makeApiUrl('/api/users/update-login-limit'), {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ userId: loginLimitModal.userId, dailyLoginLimit: newLimit })
+            });
+            const data = await response.json();
+            if (data.success) {
+                showStatus(`Login limit updated to ${newLimit === 0 ? 'unlimited' : newLimit + ' per day'}`, 'success');
+                handleCloseLoginLimitModal();
+                fetchUsers();
+            } else {
+                showStatus(data.message || 'Failed to update login limit', 'error');
+            }
+        } catch (err) {
+            showStatus('Error updating login limit', 'error');
         }
     };
 
@@ -306,6 +371,7 @@ export default function AdminDashboard() {
                                     <th className="px-3 py-2 text-center text-[8px] font-black text-[#737373] uppercase tracking-[0.2em]">Started</th>
                                     <th className="px-3 py-2 text-center text-[8px] font-black text-[#737373] uppercase tracking-[0.2em]">Last Online</th>
                                     <th className="px-3 py-2 text-center text-[8px] font-black text-[#737373] uppercase tracking-[0.2em]">Spent Time</th>
+                                    <th className="px-3 py-2 text-center text-[8px] font-black text-[#737373] uppercase tracking-[0.2em]">Daily Logins</th>
                                     <th className="px-4 py-2 text-right text-[8px] font-black text-[#737373] uppercase tracking-[0.2em]">Actions</th>
                                 </tr>
                             </thead>
@@ -320,6 +386,7 @@ export default function AdminDashboard() {
                                             <td className="px-3 py-2.5"><div className="h-2.5 bg-[#FAFAFA] border border-[#E5E7EB] w-20"></div></td>
                                             <td className="px-3 py-2.5"><div className="h-2.5 bg-[#FAFAFA] border border-[#E5E7EB] w-20"></div></td>
                                             <td className="px-3 py-2.5"><div className="h-2.5 bg-[#FAFAFA] border border-[#E5E7EB] w-14"></div></td>
+                                            <td className="px-3 py-2.5"><div className="h-2.5 bg-[#FAFAFA] border border-[#E5E7EB] w-12"></div></td>
                                             <td className="px-4 py-2.5"><div className="h-6 bg-[#FAFAFA] border border-[#E5E7EB] w-16"></div></td>
                                         </tr>
                                     ))
@@ -410,18 +477,33 @@ export default function AdminDashboard() {
                                                 </span>
                                             </div>
                                         </td>
+                                        <td className="px-3 py-2.5 text-center">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <TrendingUp size={9} className="text-[#737373]/40 shrink-0" />
+                                                <span className="text-[8px] font-bold text-[#737373] font-mono">
+                                                    {user.dailyLoginCount || 0}
+                                                </span>
+                                            </div>
+                                        </td>
                                         <td className="px-4 py-2.5">
                                             <div className="flex items-center justify-end gap-1.5">
                                                 <button 
-                                                    onClick={() => handleResetPassword(user._id)}
+                                                    onClick={() => handleOpenPasswordModal(user._id)}
                                                     className="p-2 bg-[#FAFAFA] border border-[#E5E7EB] text-[#737373] hover:text-black hover:border-black hover:bg-white transition-all active:scale-97"
                                                     title="Reset Password"
                                                 >
                                                     <Key size={14} />
                                                 </button>
+                                                <button 
+                                                    onClick={() => handleOpenLoginLimitModal(user._id, user.dailyLoginLimit)}
+                                                    className="p-2 bg-[#FAFAFA] border border-[#E5E7EB] text-[#737373] hover:text-black hover:border-black hover:bg-white transition-all active:scale-97"
+                                                    title={`Login Limit: ${user.dailyLoginLimit === 0 || user.dailyLoginLimit === undefined ? 'Unlimited' : user.dailyLoginLimit + ' per day'}`}
+                                                >
+                                                    <Gauge size={14} />
+                                                </button>
                                                 {currentUserRole === UserRole.ROOT_ADMIN && (
                                                     <button 
-                                                        onClick={() => handleDeleteUser(user._id)}
+                                                        onClick={() => handleOpenDeleteModal(user._id)}
                                                         className="p-2 bg-[#FAFAFA] border border-[#E5E7EB] text-[#737373] hover:text-red-600 hover:border-red-500/30 hover:bg-red-50 transition-all active:scale-97"
                                                         title="Delete User"
                                                     >
@@ -437,6 +519,129 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.isOpen && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-[#1A1A1A] border border-[#E5E7EB] shadow-2xl p-6 w-full max-w-sm mx-4">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Trash2 size={18} className="text-red-500" />
+                            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.15em]">
+                                Confirm Delete
+                            </h3>
+                        </div>
+                        
+                        <p className="text-[9px] text-[#A3A3A3] mb-6 font-mono">
+                            Are you sure you want to delete this user? This action cannot be undone.
+                        </p>
+                        
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleCloseDeleteModal}
+                                className="flex-1 px-4 py-2 bg-[#FAFAFA] border border-[#E5E7EB] text-[8px] font-black text-[#737373] uppercase tracking-[0.1em] hover:bg-[#F3F4F6] hover:border-[#D1D5DB] transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleConfirmDelete}
+                                className="flex-1 px-4 py-2 bg-red-600 border border-red-600 text-[8px] font-black text-white uppercase tracking-[0.1em] hover:bg-red-700 transition-all"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Password Reset Modal */}
+            {passwordModal.isOpen && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-[#1A1A1A] border border-[#E5E7EB] shadow-2xl p-6 w-full max-w-sm mx-4">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Key size={18} className="text-[#737373]" />
+                            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.15em]">
+                                Reset Password
+                            </h3>
+                        </div>
+                        
+                        <div className="mb-6">
+                            <label className="block text-[8px] font-black text-[#737373] uppercase tracking-[0.1em] mb-2">
+                                New Password (min 6 characters)
+                            </label>
+                            <input
+                                type="password"
+                                value={passwordModal.newPassword}
+                                onChange={(e) => setPasswordModal({ ...passwordModal, newPassword: e.target.value })}
+                                className="w-full bg-[#FAFAFA] border border-[#E5E7EB] px-3 py-2 text-[10px] font-mono text-[#1A1A1A] focus:outline-none focus:border-black"
+                                placeholder="Enter new password"
+                                minLength={6}
+                            />
+                        </div>
+                        
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleClosePasswordModal}
+                                className="flex-1 px-4 py-2 bg-[#FAFAFA] border border-[#E5E7EB] text-[8px] font-black text-[#737373] uppercase tracking-[0.1em] hover:bg-[#F3F4F6] hover:border-[#D1D5DB] transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSavePassword}
+                                className="flex-1 px-4 py-2 bg-[#1A1A1A] border border-[#1A1A1A] text-[8px] font-black text-white uppercase tracking-[0.1em] hover:bg-black transition-all"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Login Limit Modal */}
+            {loginLimitModal.isOpen && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-[#1A1A1A] border border-[#E5E7EB] shadow-2xl p-6 w-full max-w-sm mx-4">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Gauge size={18} className="text-[#737373]" />
+                            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.15em]">
+                                Set Daily Login Limit
+                            </h3>
+                        </div>
+                        
+                        <p className="text-[9px] text-[#A3A3A3] mb-4 font-mono">
+                            Current limit: <span className="text-white font-bold">{loginLimitModal.currentLimit === 0 ? 'Unlimited' : loginLimitModal.currentLimit}</span>
+                        </p>
+                        
+                        <div className="mb-6">
+                            <label className="block text-[8px] font-black text-[#737373] uppercase tracking-[0.1em] mb-2">
+                                Login Limit (0 = Unlimited)
+                            </label>
+                            <input
+                                type="number"
+                                value={loginLimitModal.newLimit}
+                                onChange={(e) => setLoginLimitModal({ ...loginLimitModal, newLimit: e.target.value })}
+                                className="w-full bg-[#FAFAFA] border border-[#E5E7EB] px-3 py-2 text-[10px] font-mono text-[#1A1A1A] focus:outline-none focus:border-black"
+                                placeholder="Enter number"
+                                min="0"
+                            />
+                        </div>
+                        
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleCloseLoginLimitModal}
+                                className="flex-1 px-4 py-2 bg-[#FAFAFA] border border-[#E5E7EB] text-[8px] font-black text-[#737373] uppercase tracking-[0.1em] hover:bg-[#F3F4F6] hover:border-[#D1D5DB] transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveLoginLimit}
+                                className="flex-1 px-4 py-2 bg-[#1A1A1A] border border-[#1A1A1A] text-[8px] font-black text-white uppercase tracking-[0.1em] hover:bg-black transition-all"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

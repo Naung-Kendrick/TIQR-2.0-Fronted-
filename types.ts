@@ -17,6 +17,9 @@ export interface User {
   createdAt: string;
   lastSeen?: string;
   lastLoginAt?: string;
+  dailyLoginCount?: number;
+  lastLoginDate?: string;
+  dailyLoginLimit?: number;
 }
 
 export interface DataRow {
