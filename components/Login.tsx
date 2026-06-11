@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, ArrowRight, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { SuccessModal } from './SuccessModal';
 import { makeApiUrl } from '../api/config';
-import { BackgroundPaths } from './ui/background-paths';
+import { BackgroundPaths } from '@/components/ui/background-paths';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
