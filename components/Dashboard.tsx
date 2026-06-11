@@ -17,8 +17,7 @@ import {
     Users,
     MapPin,
     ChevronDown,
-    Clock,
-    Video
+    Clock
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -29,8 +28,6 @@ import { WeatherClock } from './WeatherClock';
 import { DataRow, StatusState, OnlineUser } from '../types';
 import { makeApiUrl } from '../api/config';
 import { ShaderAnimation } from './ui/shader-animation';
-import { io } from 'socket.io-client';
-import { WebcamModal } from './WebcamModal';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
@@ -55,18 +52,6 @@ export default function Dashboard() {
 
     const [data, setData] = useState<DataRow[]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
-    
-    // Socket & Webcam states
-    const socketRef = useRef<any>(null);
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-    const [isWebcamOpen, setIsWebcamOpen] = useState(false);
-    const [webcamTarget, setWebcamTarget] = useState<any>(null);
-    
-    // Outbound streaming states (when we stream to someone else)
-    const [outboundStream, setOutboundStream] = useState<MediaStream | null>(null);
-    const outboundStreamRef = useRef<MediaStream | null>(null);
-    const outboundPeerConnectionRef = useRef<RTCPeerConnection | null>(null);
-    const [inboundRequest, setInboundRequest] = useState<{ requesterId: string; requesterName: string } | null>(null);
     const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
     const [selectedQRColumns, setSelectedQRColumns] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -257,160 +242,6 @@ export default function Dashboard() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-
-    // Extract user ID from token helper
-    const getUserIdFromToken = (token: string | null): string | null => {
-        if (!token) return null;
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return payload.id || null;
-        } catch {
-            return null;
-        }
-    };
-
-    // Socket.io initialization & WebRTC listeners
-    useEffect(() => {
-        const token = localStorage.getItem('auth_token');
-        const userId = getUserIdFromToken(token);
-        setCurrentUserId(userId);
-
-        if (!userId) return;
-
-        console.log("Dashboard: Initializing socket connection for user:", userId);
-        const socket = io();
-        socketRef.current = socket;
-
-        // Register immediately (Socket.io queues this until connected)
-        socket.emit("register", userId);
-
-        socket.on("connect", () => {
-            console.log("Dashboard: Connected to socket. Registering user...");
-            socket.emit("register", userId);
-        });
-
-        // Listen for inbound requests to share our webcam
-        socket.on("webcam-request", ({ requesterId, requesterName }: { requesterId: string; requesterName: string }) => {
-            console.log("Dashboard: Inbound webcam request received from:", requesterName);
-            setInboundRequest({ requesterId, requesterName });
-        });
-
-        socket.on("webcam-answer", async ({ answer }: { answer: any }) => {
-            console.log("Dashboard: Inbound SDP answer received");
-            if (outboundPeerConnectionRef.current) {
-                await outboundPeerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
-            }
-        });
-
-        socket.on("ice-candidate", async ({ candidate }: { candidate: any }) => {
-            try {
-                if (outboundPeerConnectionRef.current && outboundPeerConnectionRef.current.remoteDescription) {
-                    await outboundPeerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
-                }
-            } catch (e) {
-                console.error("Dashboard: Error adding ICE candidate", e);
-            }
-        });
-
-        socket.on("webcam-close", () => {
-            console.log("Dashboard: Inbound stream close notification received");
-            if (outboundPeerConnectionRef.current) {
-                outboundPeerConnectionRef.current.close();
-                outboundPeerConnectionRef.current = null;
-            }
-            if (outboundStreamRef.current) {
-                outboundStreamRef.current.getTracks().forEach(track => track.stop());
-                outboundStreamRef.current = null;
-            }
-            setOutboundStream(null);
-        });
-
-        return () => {
-            console.log("Dashboard: Disconnecting socket");
-            if (socket) {
-                socket.disconnect();
-            }
-            if (outboundPeerConnectionRef.current) {
-                outboundPeerConnectionRef.current.close();
-                outboundPeerConnectionRef.current = null;
-            }
-            if (outboundStreamRef.current) {
-                outboundStreamRef.current.getTracks().forEach(track => track.stop());
-                outboundStreamRef.current = null;
-            }
-        };
-    }, []);
-
-    const handleAcceptWebcamRequest = async () => {
-        if (!inboundRequest || !socketRef.current) return;
-        const requesterId = inboundRequest.requesterId;
-        setInboundRequest(null);
-        
-        try {
-            console.log("Dashboard: Accessing camera for outbound stream to:", requesterId);
-            const localMedia = await navigator.mediaDevices.getUserMedia({
-                video: { width: 1280, height: 720 },
-                audio: true
-            });
-            
-            setOutboundStream(localMedia);
-            outboundStreamRef.current = localMedia;
-            
-            const pc = new RTCPeerConnection({
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
-                ]
-            });
-            outboundPeerConnectionRef.current = pc;
-            
-            localMedia.getTracks().forEach(track => {
-                pc.addTrack(track, localMedia);
-            });
-            
-            pc.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socketRef.current.emit("ice-candidate", {
-                        targetUserId: requesterId,
-                        candidate: event.candidate
-                    });
-                }
-            };
-            
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            
-            socketRef.current.emit("webcam-offer", {
-                targetUserId: requesterId,
-                offer: offer
-            });
-            
-        } catch (err) {
-            console.error("Dashboard: Failed to capture/share webcam:", err);
-            socketRef.current.emit("webcam-error", {
-                targetUserId: requesterId,
-                message: "Target user's camera is unavailable or blocked."
-            });
-        }
-    };
-
-    const handleStopOutboundStream = () => {
-        if (outboundPeerConnectionRef.current) {
-            outboundPeerConnectionRef.current.close();
-            outboundPeerConnectionRef.current = null;
-        }
-        if (outboundStreamRef.current) {
-            outboundStreamRef.current.getTracks().forEach(track => track.stop());
-            outboundStreamRef.current = null;
-        }
-        setOutboundStream(null);
-        socketRef.current?.emit("webcam-close", { targetUserId: "all" });
-    };
-
-    const handleOpenWebcam = (user: any) => {
-        setWebcamTarget(user);
-        setIsWebcamOpen(true);
-    };
 
     const handleLogout = () => {
         localStorage.removeItem('auth_token');
@@ -720,19 +551,6 @@ export default function Dashboard() {
                                                             {formatTimeAgo(user.lastSeen)}
                                                         </p>
                                                     </div>
-                                                    {/* Webcam streaming trigger button */}
-                                                    {user._id !== currentUserId && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleOpenWebcam(user);
-                                                            }}
-                                                            className="p-1 text-[#737373] hover:text-black hover:bg-[#E5E7EB] border border-transparent hover:border-[#E5E7EB] transition-colors shrink-0 mr-1"
-                                                            title="Watch live Webcam feed"
-                                                        >
-                                                            <Video size={12} className="text-[#1A1A1A]" />
-                                                        </button>
-                                                    )}
                                                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0" />
                                                 </div>
                                             ))
@@ -984,61 +802,6 @@ export default function Dashboard() {
                     to { transform: translateY(0); opacity: 1; }
                 }
             `}</style>
-
-            {/* Webcam Stream Modal */}
-            <WebcamModal
-                isOpen={isWebcamOpen}
-                onClose={() => setIsWebcamOpen(false)}
-                targetUser={webcamTarget}
-                socket={socketRef.current}
-                currentUserId={currentUserId}
-            />
-
-            {/* Inbound webcam stream request banner */}
-            {inboundRequest && (
-                <div className="fixed top-16 left-1/2 -translate-x-1/2 z-[999] w-[350px] bg-black/90 border border-cyan-500/30 p-4 shadow-2xl flex flex-col gap-3 font-mono text-white animate-in slide-in-from-top-4 duration-300">
-                    <div className="flex items-start gap-2.5">
-                        <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-ping mt-1" />
-                        <div>
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">INBOUND CCTV REQUEST</h4>
-                            <p className="text-[9px] text-[#A3A3A3] mt-1 leading-relaxed">
-                                USER <span className="text-white font-bold">{inboundRequest.requesterName}</span> IS REQUESTING A SECURE WEBCAM STREAM OF YOUR LOCATION.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex gap-2 text-[9px] font-black uppercase mt-1">
-                        <button 
-                            onClick={handleAcceptWebcamRequest}
-                            className="flex-1 py-1.5 bg-cyan-500 text-black hover:bg-cyan-400 transition-all"
-                        >
-                            ALLOW STREAM
-                        </button>
-                        <button 
-                            onClick={() => {
-                                socketRef.current?.emit("webcam-error", { targetUserId: inboundRequest.requesterId, message: "User rejected feed access." });
-                                setInboundRequest(null);
-                            }}
-                            className="px-3 py-1.5 border border-[#E5E7EB]/10 hover:bg-white/5 transition-all text-[#737373] hover:text-white"
-                        >
-                            DENY
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Outbound active streaming notification */}
-            {outboundStream && (
-                <div className="fixed bottom-4 left-4 z-[999] bg-red-600 border border-red-500/30 p-2.5 px-4 shadow-2xl flex items-center gap-3 font-mono text-white text-[9px] uppercase tracking-wider animate-pulse font-bold">
-                    <div className="w-2 h-2 bg-white rounded-full" />
-                    <span>ACTIVE OUTBOUND CAMERA FEED (STREAMING)</span>
-                    <button 
-                        onClick={handleStopOutboundStream}
-                        className="ml-2 px-1.5 py-0.5 bg-black/40 border border-white/20 text-white hover:bg-black/60 transition-colors font-bold"
-                    >
-                        STOP
-                    </button>
-                </div>
-            )}
         </div>
     );
 }
