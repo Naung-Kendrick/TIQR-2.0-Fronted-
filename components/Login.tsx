@@ -156,7 +156,7 @@ export function Login() {
                                 disabled={isLoading}
                                 className="w-full group flex items-center justify-center gap-2 bg-black text-white py-3 font-bold tracking-widest text-[11px] uppercase transition-all duration-150 hover:bg-black/80 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {isLoading ? 'Authenticating...' : 'Authenticate Session'}
+                                {isLoading ? 'Verifying...' : 'Verify Identity'}
                                 {!isLoading && <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform duration-150" />}
                             </button>
                         </form>

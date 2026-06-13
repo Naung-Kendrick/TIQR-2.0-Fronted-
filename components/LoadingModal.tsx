@@ -125,9 +125,9 @@ export function LoadingModal({ isVisible, status }: LoadingModalProps) {
                                             strokeLinecap="round"
                                         />
                                     </svg>
-                                    
+
                                     {/* Centered red timing text */}
-                                    <span 
+                                    <span
                                         className="font-mono font-bold text-sm z-10 transition-colors duration-300"
                                         style={{ color: currentColor }}
                                     >
@@ -138,10 +138,10 @@ export function LoadingModal({ isVisible, status }: LoadingModalProps) {
 
                             {/* Title & Status */}
                             <h3 className="text-[#1A1A1A] font-black text-xs uppercase tracking-[0.2em] mb-2">
-                                Authenticating Session
+                                Authenticating...
                             </h3>
                             <p className="text-[#737373] text-[10px] font-bold uppercase tracking-widest">
-                                {status === 'success' ? 'Clearing Session Handshake...' : 'Connecting to Secure Gateway...'}
+                                {status === 'success' ? 'Loading Data...' : 'Connecting to TIQR System...'}
                             </p>
 
                             {/* Simple explanatory note if sleeping */}
@@ -154,7 +154,7 @@ export function LoadingModal({ isVisible, status }: LoadingModalProps) {
                                         className="mt-6 pt-5 border-t border-[#E5E7EB]"
                                     >
                                         <p className="text-[#737373] text-[10px] font-medium leading-relaxed">
-                                            The backend server is waking up from standby. 
+                                            The backend server is waking up from standby.
                                             This may take up to 50 seconds. Please do not close this page.
                                         </p>
                                     </motion.div>
