@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, ArrowRight, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { SuccessModal } from './SuccessModal';
+import { LoadingModal } from './LoadingModal';
 import { makeApiUrl } from '../api/config';
-import { BackgroundPaths } from '@/components/ui/background-paths';
+import { BackgroundPaths } from './ui/background-paths';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
@@ -13,7 +13,8 @@ export function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [loginStatus, setLoginStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     React.useEffect(() => {
         if (!localStorage.getItem('device_id')) {
@@ -31,6 +32,8 @@ export function Login() {
             return;
         }
 
+        setIsLoading(true);
+        setLoginStatus('loading');
         try {
             const response = await fetch(makeApiUrl('/api/users/login'), {
                 method: 'POST',
@@ -52,19 +55,23 @@ export function Login() {
                 localStorage.setItem('auth_role', data.user.role.toString());
                 localStorage.setItem('user_name', data.user.name);
 
-                // Show success animation
-                setShowSuccess(true);
-
-                // Wait for 2 seconds then navigate
+                // Hold loader for 4 seconds then navigate to dashboard
+                setLoginStatus('success');
                 setTimeout(() => {
+                    setIsLoading(false);
+                    setLoginStatus('idle');
                     navigate('/dashboard');
-                }, 2000);
+                }, 4000);
             } else {
                 setError(data.message || 'Invalid credentials.');
+                setIsLoading(false);
+                setLoginStatus('error');
             }
         } catch (err) {
             console.error('Login error:', err);
             setError('Login failed. Please check your connection or try again later.');
+            setIsLoading(false);
+            setLoginStatus('error');
         }
     };
 
@@ -146,10 +153,11 @@ export function Login() {
 
                             <button
                                 type="submit"
-                                className="w-full group flex items-center justify-center gap-2 bg-black text-white py-3 font-bold tracking-widest text-[11px] uppercase transition-all duration-150 hover:bg-black/80 mt-4"
+                                disabled={isLoading}
+                                className="w-full group flex items-center justify-center gap-2 bg-black text-white py-3 font-bold tracking-widest text-[11px] uppercase transition-all duration-150 hover:bg-black/80 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Authenticate Session
-                                <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform duration-150" />
+                                {isLoading ? 'Authenticating...' : 'Authenticate Session'}
+                                {!isLoading && <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform duration-150" />}
                             </button>
                         </form>
 
@@ -182,8 +190,8 @@ export function Login() {
                 <BackgroundPaths title="TA'ANG LAND IMMIGRATION DEPARTMENT" />
             </div>
 
-            {/* Success Animation Modal */}
-            <SuccessModal isVisible={showSuccess} />
+            {/* Server Waking Loading Animation Modal */}
+            <LoadingModal isVisible={isLoading} status={loginStatus} />
         </div>
     );
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, ArrowRight, Lock, User as UserIcon, Mail, Phone, MapPin } from 'lucide-react';
-import { SuccessModal } from './SuccessModal';
+import { LoadingModal } from './LoadingModal';
 import { makeApiUrl } from '../api/config';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
@@ -14,8 +14,8 @@ export function Register() {
     const [phone, setPhone] = useState('');
     const [township, setTownship] = useState('');
     const [error, setError] = useState('');
-    const [showSuccess, setShowSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [registerStatus, setRegisterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     const townships = ["Namhsan Team", "Namkham Team", "Manton Team", "Namtu Team", "Namkham Border Team", "Mongwee Team", "Mongbow Team", "MongNgaw Team", "Kutkai Team"];
 
@@ -23,10 +23,12 @@ export function Register() {
         e.preventDefault();
         setError('');
         setIsSubmitting(true);
+        setRegisterStatus('loading');
 
         if (!name || !email || !password || !township) {
             setError('Please fill in all required fields.');
             setIsSubmitting(false);
+            setRegisterStatus('error');
             return;
         }
 
@@ -48,21 +50,23 @@ export function Register() {
             const data = await response.json();
 
             if (data.success) {
-                // Show success animation
-                setShowSuccess(true);
-
-                // Wait for 2 seconds then navigate to login
+                // Hold loader for 4 seconds then navigate to login
+                setRegisterStatus('success');
                 setTimeout(() => {
+                    setIsSubmitting(false);
+                    setRegisterStatus('idle');
                     navigate('/');
-                }, 2000);
+                }, 4000);
             } else {
                 setError(data.message || 'Registration failed.');
+                setIsSubmitting(false);
+                setRegisterStatus('error');
             }
         } catch (err) {
             console.error('Registration error:', err);
             setError('Connection failed. Please try again.');
-        } finally {
             setIsSubmitting(false);
+            setRegisterStatus('error');
         }
     };
 
@@ -223,8 +227,8 @@ export function Register() {
                 </div>
             </div>
 
-            {/* Success Animation Modal */}
-            <SuccessModal isVisible={showSuccess} />
+            {/* Server Waking Loading Animation Modal */}
+            <LoadingModal isVisible={isSubmitting} status={registerStatus} />
         </div>
     );
 }
