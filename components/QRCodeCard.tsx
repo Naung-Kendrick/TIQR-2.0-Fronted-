@@ -102,11 +102,10 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
         return (
             <div
                 onClick={handleCardClick}
-                className={`group bg-white border hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden h-full ${
-                    isSelected
+                className={`group bg-white border hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden h-full ${isSelected
                         ? 'border-black ring-1 ring-black/10'
                         : 'border-[#E5E7EB] hover:border-[#737373]/30 shadow-md'
-                } ${selectionMode ? 'cursor-pointer' : ''}`}
+                    } ${selectionMode ? 'cursor-pointer' : ''}`}
             >
                 {/* Selection Checkbox */}
                 {selectionMode && (
@@ -118,11 +117,10 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                         }}
                     >
                         <div
-                            className={`w-6 h-6 border-2 flex items-center justify-center transition-all duration-200 ${
-                                isSelected
+                            className={`w-6 h-6 border-2 flex items-center justify-center transition-all duration-200 ${isSelected
                                     ? 'bg-black border-black'
                                     : 'bg-[#FAFAFA] border-[#E5E7EB] hover:border-black backdrop-blur-sm'
-                            }`}
+                                }`}
                         >
                             {isSelected && (
                                 <Check size={14} className="text-white" strokeWidth={3} />
@@ -136,19 +134,6 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                     <div className="absolute inset-0 bg-black/[0.02] pointer-events-none z-0" />
                 )}
 
-                {/* Authenticity Watermark - TLG Seal */}
-                <div
-                    className="absolute inset-0 pointer-events-none z-0"
-                    style={{
-                        backgroundImage: `url(/tlg-seal.png)`,
-                        backgroundPosition: 'center center',
-                        backgroundSize: '75%',
-                        backgroundRepeat: 'no-repeat',
-                        opacity: 0.055,
-                        filter: 'grayscale(100%) contrast(1.2)',
-                        mixBlendMode: 'multiply',
-                    }}
-                />
 
                 {/* Card Header */}
                 <div className="px-3 py-2.5 border-b border-[#E5E7EB] flex items-center bg-[#FAFAFA]">
@@ -173,6 +158,12 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                             size={100}
                             level="M"
                             includeMargin={true}
+                            imageSettings={{
+                                src: logo,
+                                height: 24,
+                                width: 24,
+                                excavate: true,
+                            }}
                             fgColor="#0f172a"
                         />
                     </div>
@@ -206,8 +197,8 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                         <button
                             onClick={(e) => { e.stopPropagation(); handleCopy(); }}
                             className={`px-2.5 py-2 transition-all border ${isCopied
-                                    ? 'bg-black text-white border-black'
-                                    : 'bg-[#FAFAFA] border-[#E5E7EB] text-[#737373] hover:border-[#737373] hover:text-[#1A1A1A]'
+                                ? 'bg-black text-white border-black'
+                                : 'bg-[#FAFAFA] border-[#E5E7EB] text-[#737373] hover:border-[#737373] hover:text-[#1A1A1A]'
                                 }`}
                             title="Copy Data"
                         >
