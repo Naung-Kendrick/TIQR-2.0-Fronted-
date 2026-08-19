@@ -453,8 +453,8 @@ export default function Dashboard() {
                     backgroundPosition: 'center center',
                     backgroundSize: '55vh',
                     backgroundRepeat: 'no-repeat',
-                    opacity: 0.045,
-                    filter: 'grayscale(100%) contrast(1.1)',
+                    opacity: 0.08,
+                    filter: 'contrast(1.1) saturate(1.2)',
                 }}
             />
 
