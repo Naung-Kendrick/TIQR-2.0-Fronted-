@@ -445,6 +445,19 @@ export default function Dashboard() {
     return (
         <div className="h-screen overflow-hidden text-[#1A1A1A] font-sans selection:bg-black/10 relative tps-page-enter bg-transparent">
 
+            {/* TLG Seal Watermark Background */}
+            <div
+                className="fixed inset-0 pointer-events-none z-0"
+                style={{
+                    backgroundImage: `url(/tlg-seal.png)`,
+                    backgroundPosition: 'center center',
+                    backgroundSize: '55vh',
+                    backgroundRepeat: 'no-repeat',
+                    opacity: 0.045,
+                    filter: 'grayscale(100%) contrast(1.1)',
+                }}
+            />
+
             {/* Join Notifications */}
             <div className="fixed top-3 right-3 z-[999] flex flex-col gap-2 pointer-events-none max-w-[calc(100vw-24px)]">
                 {joinNotifications.map(n => (
