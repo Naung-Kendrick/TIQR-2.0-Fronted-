@@ -136,14 +136,17 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                     <div className="absolute inset-0 bg-black/[0.02] pointer-events-none z-0" />
                 )}
 
-                {/* Authenticity Watermark - Guilloche Style */}
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                {/* Authenticity Watermark - TLG Seal */}
+                <div
+                    className="absolute inset-0 pointer-events-none z-0"
                     style={{
-                        backgroundImage: `url(${logo})`,
-                        backgroundPosition: '120% -20%',
-                        backgroundSize: '70%',
+                        backgroundImage: `url(/tlg-seal.png)`,
+                        backgroundPosition: 'center center',
+                        backgroundSize: '75%',
                         backgroundRepeat: 'no-repeat',
-                        filter: 'grayscale(100%)'
+                        opacity: 0.055,
+                        filter: 'grayscale(100%) contrast(1.2)',
+                        mixBlendMode: 'multiply',
                     }}
                 />
 
