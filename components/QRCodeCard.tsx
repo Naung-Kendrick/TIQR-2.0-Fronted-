@@ -173,12 +173,6 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                             size={100}
                             level="M"
                             includeMargin={true}
-                            imageSettings={{
-                                src: logo,
-                                height: 24,
-                                width: 24,
-                                excavate: true,
-                            }}
                             fgColor="#0f172a"
                         />
                     </div>
