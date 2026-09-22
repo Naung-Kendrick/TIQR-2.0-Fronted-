@@ -17,7 +17,9 @@ import {
     Power,
     MapPin,
     Clock,
-    TrendingUp
+    TrendingUp,
+    WrenchIcon,
+    X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserRole, StatusState } from '../types';
@@ -44,7 +46,21 @@ export default function AdminDashboard() {
     const [loginLimitModal, setLoginLimitModal] = useState<{ isOpen: boolean; userId: string; currentLimit: number; newLimit: string }>({ isOpen: false, userId: '', currentLimit: 0, newLimit: '' });
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; userId: string }>({ isOpen: false, userId: '' });
     const [passwordModal, setPasswordModal] = useState<{ isOpen: boolean; userId: string; newPassword: string }>({ isOpen: false, userId: '', newPassword: '' });
+    const [maintenanceMode, setMaintenanceMode] = useState<boolean>(() => localStorage.getItem('maintenance_mode') === 'true');
+    const [maintenanceConfirmModal, setMaintenanceConfirmModal] = useState(false);
     const navigate = useNavigate();
+
+    const handleToggleMaintenance = () => {
+        setMaintenanceConfirmModal(true);
+    };
+
+    const confirmToggleMaintenance = () => {
+        const next = !maintenanceMode;
+        setMaintenanceMode(next);
+        localStorage.setItem('maintenance_mode', next ? 'true' : 'false');
+        setMaintenanceConfirmModal(false);
+        showStatus(next ? 'Maintenance mode ENABLED — login page is now restricted' : 'Maintenance mode DISABLED — login page is restored', next ? 'error' : 'success');
+    };
 
     useEffect(() => {
         const role = localStorage.getItem('auth_role');
@@ -301,12 +317,81 @@ export default function AdminDashboard() {
                                 <span>{status.message}</span>
                             </div>
                         )}
+                        {/* Maintenance Mode Toggle */}
+                        <button
+                            onClick={handleToggleMaintenance}
+                            title={maintenanceMode ? 'Maintenance mode is ON — click to disable' : 'Enable maintenance mode'}
+                            className={`flex items-center gap-2 px-3 py-1.5 border text-[10px] font-black uppercase tracking-widest transition-all active:scale-97 ${
+                                maintenanceMode
+                                    ? 'bg-amber-500 border-amber-600 text-white hover:bg-amber-600 animate-pulse'
+                                    : 'bg-white border-[#E5E7EB] text-[#737373] hover:border-black hover:text-[#1A1A1A]'
+                            }`}
+                        >
+                            <WrenchIcon size={12} />
+                            {maintenanceMode ? 'Maintenance: ON' : 'Maintenance'}
+                        </button>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black uppercase tracking-widest">
                             <Shield size={12} />
                             {getRoleName(currentUserRole)}
                         </div>
                     </div>
                 </header>
+
+                {/* Maintenance Confirmation Modal */}
+                {maintenanceConfirmModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in">
+                        <div className="bg-white border border-[#E5E7EB] shadow-2xl w-full max-w-sm mx-4 relative">
+                            {/* Top accent */}
+                            <div className={`absolute top-0 left-0 right-0 h-[3px] ${maintenanceMode ? 'bg-green-500' : 'bg-amber-500'}`} />
+                            <div className="p-6 pt-7">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-10 h-10 flex items-center justify-center border ${
+                                            maintenanceMode ? 'bg-green-50 border-green-200 text-green-600' : 'bg-amber-50 border-amber-200 text-amber-600'
+                                        }`}>
+                                            <WrenchIcon size={18} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-tight">
+                                                {maintenanceMode ? 'Disable Maintenance?' : 'Enable Maintenance?'}
+                                            </h3>
+                                            <p className="text-[#737373] text-[9px] font-bold uppercase tracking-wider mt-0.5">
+                                                System Access Control
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setMaintenanceConfirmModal(false)}
+                                        className="text-[#737373] hover:text-[#1A1A1A] transition-colors p-1"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                                <p className="text-[#1A1A1A] text-xs font-medium leading-relaxed mb-5">
+                                    {maintenanceMode
+                                        ? 'This will restore the login page and allow users to access the system normally.'
+                                        : 'This will replace the login page with a maintenance notice. Users will not be able to log in until maintenance mode is turned off.'}
+                                </p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setMaintenanceConfirmModal(false)}
+                                        className="flex-1 py-2 border border-[#E5E7EB] text-[#737373] text-[10px] font-black uppercase tracking-widest hover:border-black hover:text-[#1A1A1A] transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmToggleMaintenance}
+                                        className={`flex-1 py-2 text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-97 ${
+                                            maintenanceMode ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-500 hover:bg-amber-600'
+                                        }`}
+                                    >
+                                        {maintenanceMode ? 'Restore Access' : 'Enable Now'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Dashboard Stats / Actions */}
                 <div className="grid grid-cols-3 gap-3 mb-4">

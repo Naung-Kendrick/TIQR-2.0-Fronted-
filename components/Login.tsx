@@ -15,13 +15,38 @@ export function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [loginStatus, setLoginStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
+    const [iconClickCount, setIconClickCount] = useState(0);
+    const [showAdminBypass, setShowAdminBypass] = useState(false);
+    const iconClickTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
     React.useEffect(() => {
         if (!localStorage.getItem('device_id')) {
             const newId = crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             localStorage.setItem('device_id', newId);
         }
+        // Check maintenance mode
+        const checkMaintenance = () => {
+            setMaintenanceMode(localStorage.getItem('maintenance_mode') === 'true');
+        };
+        checkMaintenance();
+        window.addEventListener('storage', checkMaintenance);
+        return () => window.removeEventListener('storage', checkMaintenance);
     }, []);
+
+    // Secret bypass: click wrench icon 5 times within 3s
+    const handleIconClick = () => {
+        if (iconClickTimer.current) clearTimeout(iconClickTimer.current);
+        setIconClickCount(prev => {
+            const next = prev + 1;
+            if (next >= 5) {
+                setShowAdminBypass(true);
+                return 0;
+            }
+            iconClickTimer.current = setTimeout(() => setIconClickCount(0), 3000);
+            return next;
+        });
+    };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,7 +103,164 @@ export function Login() {
     return (
         <div className="min-h-screen flex relative overflow-hidden bg-transparent">
 
-            {/* Left Panel — Login Form */}
+            {/* ── MAINTENANCE MODE SCREEN ── */}
+            {maintenanceMode ? (
+                <div className="w-full min-h-screen flex flex-col items-center justify-center bg-[#FAFAFA] relative overflow-hidden">
+                    {/* Top accent line */}
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-black z-10" />
+
+                    {/* Dot-grid background — drifts slowly */}
+                    <div
+                        className="mtn-dot-grid"
+                        style={{
+                            position: 'absolute', inset: 0,
+                            backgroundImage: 'radial-gradient(circle, #D1D5DB 1px, transparent 1px)',
+                            backgroundSize: '24px 24px',
+                            opacity: 0.6
+                        }}
+                    />
+
+                    {/* Scan line sweeping top→bottom */}
+                    <div
+                        className="mtn-scan-line pointer-events-none absolute left-0 right-0 z-20"
+                        style={{
+                            top: 0,
+                            height: '120px',
+                            background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.035), transparent)'
+                        }}
+                    />
+
+                    <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-xl">
+                        {/* Label — stagger 1 */}
+                        <p className="mtn-item-1 text-[#737373] text-[9px] font-black uppercase tracking-[0.4em] mb-8 flex items-center gap-2">
+                            <ShieldCheck size={10} className="text-[#1A1A1A]" />
+                            Ta'ang Land Immigration Department
+                        </p>
+
+                        {/* Icon box — stagger 2 + breathe — click 5× for admin bypass */}
+                        <div
+                            className="mtn-item-2 mtn-icon-breathe w-16 h-16 mb-8 bg-white border border-[#E5E7EB] flex items-center justify-center cursor-default select-none"
+                            onClick={handleIconClick}
+                            title=""
+                        >
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                            </svg>
+                        </div>
+
+                        {/* Tiny click-count hint dots — visible only after first click */}
+                        {iconClickCount > 0 && (
+                            <div className="absolute flex gap-1 mb-1" style={{ top: 'calc(50% - 80px)' }}>
+                                {[...Array(5)].map((_, i) => (
+                                    <span
+                                        key={i}
+                                        className={`w-1 h-1 rounded-full transition-all duration-200 ${
+                                            i < iconClickCount ? 'bg-black' : 'bg-[#E5E7EB]'
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Title — stagger 3 */}
+                        <h1 className="mtn-item-3 text-[#1A1A1A] text-5xl font-black uppercase tracking-tight leading-none mb-5">
+                            System Under<br />Maintenance
+                        </h1>
+
+                        {/* Divider bar — expands outward */}
+                        <div className="mtn-bar h-[2px] bg-black mb-8" />
+
+                        {/* Status badge — stagger 4 */}
+                        <div className="mtn-item-4 flex items-center gap-2.5 px-5 py-2.5 bg-white border border-[#E5E7EB]">
+                            <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
+                            <span className="text-[#1A1A1A] text-[9px] font-black uppercase tracking-[0.3em]">
+                                Downtime In Progress
+                            </span>
+                        </div>
+
+                        {/* Footer — stagger 5 */}
+                        <p className="mtn-item-5 text-[#737373] text-[9px] font-bold uppercase tracking-[0.3em] mt-14 opacity-40">
+                            TIQR V 2.0.0 &nbsp;·&nbsp; Secure Gateway Portal
+                        </p>
+                    </div>
+
+                    {/* ── ADMIN BYPASS OVERLAY ── */}
+                    {showAdminBypass && (
+                        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/20 backdrop-blur-sm"
+                            onClick={(e) => { if (e.target === e.currentTarget) setShowAdminBypass(false); }}
+                        >
+                            <div className="w-full max-w-sm mx-4 mb-8 bg-white border border-[#E5E7EB] shadow-2xl relative tps-page-enter">
+                                {/* Accent */}
+                                <div className="absolute top-0 left-0 right-0 h-[2px] bg-black" />
+                                <div className="px-7 py-6">
+                                    <div className="flex items-center justify-between mb-5">
+                                        <div>
+                                            <p className="text-[#737373] text-[8px] font-black uppercase tracking-[0.3em]">Admin Access</p>
+                                            <h2 className="text-[#1A1A1A] text-sm font-black uppercase tracking-tight">Override Login</h2>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowAdminBypass(false)}
+                                            className="text-[#737373] hover:text-[#1A1A1A] transition-colors text-lg leading-none"
+                                        >✕</button>
+                                    </div>
+
+                                    <form onSubmit={handleLogin} className="space-y-3">
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#737373] group-focus-within:text-[#1A1A1A] transition-colors">
+                                                <User size={14} />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={username}
+                                                onChange={(e) => setUsername(e.target.value)}
+                                                className="w-full pl-8 pr-3 py-2.5 border border-[#E5E7EB] outline-none text-[#1A1A1A] font-medium text-sm placeholder:text-[#737373] focus:border-black transition-all"
+                                                style={{ background: '#FAFAFA' }}
+                                                placeholder="Username"
+                                                autoFocus
+                                            />
+                                        </div>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#737373] group-focus-within:text-[#1A1A1A] transition-colors">
+                                                <Lock size={14} />
+                                            </div>
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="w-full pl-8 pr-9 py-2.5 border border-[#E5E7EB] outline-none text-[#1A1A1A] font-medium text-sm placeholder:text-[#737373] focus:border-black transition-all"
+                                                style={{ background: '#FAFAFA' }}
+                                                placeholder="Password"
+                                            />
+                                            <button type="button" onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#737373] hover:text-[#1A1A1A] transition-colors">
+                                                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                                            </button>
+                                        </div>
+
+                                        {error && (
+                                            <div className="p-2.5 bg-[#FFF1F2] border border-[#FFE4E6] text-[#BE123C] text-[10px] font-bold text-center uppercase tracking-wider flex justify-center items-center gap-2">
+                                                <ShieldCheck size={11} /> {error}
+                                            </div>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            disabled={isLoading}
+                                            className="w-full flex items-center justify-center gap-2 bg-black text-white py-2.5 font-black tracking-widest text-[10px] uppercase transition-all hover:bg-black/80 mt-1 disabled:opacity-50"
+                                        >
+                                            {isLoading ? 'Verifying...' : 'Verify Identity'}
+                                            {!isLoading && <ArrowRight size={13} />}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+            ) : (
+                <>
+
             <div className="w-full lg:w-[360px] flex items-center justify-center bg-[#FAFAFA]/75 backdrop-blur-md h-screen overflow-hidden border-r border-[#E5E7EB]">
                 <div className="w-full px-6 py-6 relative z-10 tps-page-enter">
                     <div className="bg-white border border-[#E5E7EB] shadow-2xl px-8 py-7 relative">
@@ -192,6 +374,9 @@ export function Login() {
 
             {/* Server Waking Loading Animation Modal */}
             <LoadingModal isVisible={isLoading} status={loginStatus} />
+        </>
+        )}
+
         </div>
     );
 }
