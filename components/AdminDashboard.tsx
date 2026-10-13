@@ -340,10 +340,10 @@ export default function AdminDashboard() {
                         </button>
                         <button
                             onClick={() => navigate('/checker')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#1E3A8A] ring-1 ring-[#1E3A8A]/50 text-[#1A1A1A] text-[10px] font-black hover:bg-[#1E3A8A] hover:text-white transition-all active:scale-97 uppercase tracking-widest shadow-[0_0_8px_rgba(30,58,138,0.25)] group"
                             title="Open Excel Data Checker"
                         >
-                            <FileSpreadsheet size={12} /> Data Checker
+                            <FileSpreadsheet size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" /> Data Checker
                         </button>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black uppercase tracking-widest">
                             <Shield size={12} />

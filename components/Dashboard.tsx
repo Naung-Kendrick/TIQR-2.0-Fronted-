@@ -656,13 +656,9 @@ export default function Dashboard() {
                         )}
                         <button
                             onClick={() => navigate('/checker')}
-                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 bg-white border border-[#1E3A8A] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-[#1E3A8A] hover:text-white transition-all active:scale-97 uppercase tracking-widest shadow-2xs group"
+                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-white border border-[#1E3A8A] ring-1 ring-[#1E3A8A]/50 text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-[#1E3A8A] hover:text-white transition-all active:scale-97 uppercase tracking-widest shadow-[0_0_8px_rgba(30,58,138,0.25)] group"
                             title="Open Excel Data Checker"
                         >
-                            <span className="relative flex h-1.5 w-1.5">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#1E3A8A] group-hover:bg-white"></span>
-                            </span>
                             <FileSpreadsheet size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" />
                             <span className="hidden sm:inline">DATA CHECKER</span><span className="sm:hidden">CHECKER</span>
                         </button>
