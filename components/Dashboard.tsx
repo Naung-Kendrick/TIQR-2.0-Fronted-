@@ -569,8 +569,8 @@ export default function Dashboard() {
                                     တီုင်စေတ်မေန်းတိုအီး <span className="text-[#737373] hidden sm:inline">[TIQR CREATOR]</span><span className="text-[#737373] sm:hidden">[TIQR]</span>
                                     <span className="ml-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 bg-white text-[#1A1A1A] text-[7px] sm:text-[8px] font-black border border-[#E5E7EB] uppercase tracking-wider align-middle">
                                         <span className="relative flex h-1.5 w-1.5">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#1E3A8A]"></span>
                                         </span>
                                         V 3.0.0
                                     </span>
