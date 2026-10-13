@@ -332,7 +332,7 @@ export default function DataCheckerDashboard() {
             </div>
 
             {/* Admin Link if authorized */}
-            {(parseInt(userRole) === 1 || parseInt(userRole) === 2) && (
+            {isAdmin && (
               <button
                 onClick={() => navigate('/admin')}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-wider"
