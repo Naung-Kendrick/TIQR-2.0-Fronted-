@@ -180,7 +180,7 @@ export function Login() {
 
                         {/* Footer — stagger 5 */}
                         <p className="mtn-item-5 text-[#737373] text-[9px] font-bold uppercase tracking-[0.3em] mt-14 opacity-40">
-                            TIQR V 2.0.0 &nbsp;·&nbsp; Secure Gateway Portal
+                            TIQR V 3.0.0 &nbsp;·&nbsp; Secure Gateway Portal
                         </p>
                     </div>
 
@@ -359,7 +359,7 @@ export function Login() {
                                     Ta'ang Land Img QR Code Creator
                                 </p>
                                 <p className="text-[#1A1A1A] text-[9px] font-black uppercase tracking-[0.3em] opacity-40">
-                                    VERSION V 2.0.0
+                                    VERSION V 3.0.0
                                 </p>
                             </div>
                         </div>

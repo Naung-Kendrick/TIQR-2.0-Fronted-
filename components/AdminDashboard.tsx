@@ -19,7 +19,8 @@ import {
     Clock,
     TrendingUp,
     WrenchIcon,
-    X
+    X,
+    FileSpreadsheet
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserRole, StatusState } from '../types';
@@ -329,6 +330,13 @@ export default function AdminDashboard() {
                         >
                             <WrenchIcon size={12} />
                             {maintenanceMode ? 'Maintenance: ON' : 'Maintenance'}
+                        </button>
+                        <button
+                            onClick={() => navigate('/checker')}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest"
+                            title="Open Excel Data Checker"
+                        >
+                            <FileSpreadsheet size={12} /> Data Checker
                         </button>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black uppercase tracking-widest">
                             <Shield size={12} />

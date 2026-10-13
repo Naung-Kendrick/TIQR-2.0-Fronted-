@@ -4,6 +4,7 @@ import { Login } from './components/Login';
 import { Register } from './components/Register';
 import Dashboard from './components/Dashboard';
 import AdminDashboard from './components/AdminDashboard';
+import DataCheckerDashboard from './components/DataChecker/DataCheckerDashboard';
 import { UserRole } from './types';
 
 
@@ -42,6 +43,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checker"
+          element={
+            <ProtectedRoute>
+              <DataCheckerDashboard />
             </ProtectedRoute>
           }
         />

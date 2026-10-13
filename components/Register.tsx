@@ -220,7 +220,7 @@ export function Register() {
                                 Ta'ang Land Img QR Code Creator
                             </p>
                             <p className="text-[#1A1A1A] text-[9px] font-black uppercase tracking-[0.3em] opacity-40">
-                                VERSION V 2.0.0
+                                VERSION V 3.0.0
                             </p>
                         </div>
                     </div>

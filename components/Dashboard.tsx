@@ -24,13 +24,57 @@ import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { QRCodeCard, QRCodeCardHandle } from './QRCodeCard';
-import { WeatherClock } from './WeatherClock';
 import { DataRow, StatusState, OnlineUser } from '../types';
 import { makeApiUrl } from '../api/config';
 import { ShaderAnimation } from './ui/shader-animation';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
+// Clock-only widget (no weather)
+function ClockOnly({ compact = false }: { compact?: boolean }) {
+  const [time, setTime] = React.useState(new Date());
+  React.useEffect(() => {
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const hhmm = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const ss = String(time.getSeconds()).padStart(2, '0');
+  const date = time.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-[#E5E7EB]">
+        <Clock size={11} className="text-[#737373] shrink-0" />
+        <span className="text-[11px] font-black text-[#1A1A1A] tabular-nums leading-none">{hhmm}</span>
+        <span className="text-[8px] font-bold text-[#737373]/60 tabular-nums">:{ss}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-md border border-[#E5E7EB]">
+      <div className="w-8 h-8 bg-[#FAFAFA] border border-[#E5E7EB] flex items-center justify-center relative">
+        <Clock size={14} className="text-[#1A1A1A]" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `conic-gradient(rgba(26,26,26,0.15) ${(time.getSeconds() / 60) * 360}deg, transparent 0deg)`,
+            mask: 'radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))',
+            WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))',
+          }}
+        />
+      </div>
+      <div className="flex flex-col">
+        <div className="flex items-baseline gap-0.5">
+          <span className="text-sm font-black text-[#1A1A1A] tabular-nums leading-none">{hhmm}</span>
+          <span className="text-[8px] font-bold text-[#737373] tabular-nums">:{ss}</span>
+        </div>
+        <span className="text-[9px] font-bold text-[#737373] uppercase tracking-wider leading-none mt-0.5">{date}</span>
+      </div>
+    </div>
+  );
+}
 
 const formatTimeAgo = (dateString: string) => {
     if (!dateString) return 'just now';
@@ -498,22 +542,22 @@ export default function Dashboard() {
                             <div className="min-w-0">
                                 <h1 className="text-sm sm:text-base font-bold text-[#1A1A1A] tracking-tight uppercase leading-tight">
                                     တီုင်စေတ်မေန်းတိုအီး <span className="text-[#737373] hidden sm:inline">[TIQR CREATOR]</span><span className="text-[#737373] sm:hidden">[TIQR]</span>
-                                    <span className="ml-1 px-1 py-0.5 bg-[#FAFAFA] text-[#737373] text-[7px] font-black border border-[#E5E7EB] uppercase tracking-tighter align-middle">V 2.0.0</span>
+                                    <span className="ml-1 px-1 py-0.5 bg-[#FAFAFA] text-[#737373] text-[7px] font-black border border-[#E5E7EB] uppercase tracking-tighter align-middle">V 3.0.0</span>
                                 </h1>
                                 <p className="text-[#737373] text-[8px] font-bold hidden sm:flex items-center gap-1.5 mt-0.5 uppercase tracking-wider">
-                                    <ShieldCheck size={9} className="text-[#737373] shrink-0" /> powered By <span className="text-[#1A1A1A] opacity-80">Mai Naung Naung & Mai Nay Lin</span>
+                                    <ShieldCheck size={9} className="text-[#737373] shrink-0" /> powered By <span style={{ color: '#1E3A8A' }}>Mai Naung Naung &amp; Mai Nay Lin</span>
                                 </p>
                             </div>
                         </div>
                         {/* Compact clock — mobile only */}
                         <div className="sm:hidden shrink-0">
-                            <WeatherClock compact />
+                            <ClockOnly compact />
                         </div>
                     </div>
 
                     {/* Center: Full Clock — desktop only */}
                     <div className="hidden sm:block">
-                        <WeatherClock />
+                        <ClockOnly />
                     </div>
 
                     {/* Row 2 on mobile / right side on desktop: action buttons */}
@@ -579,6 +623,13 @@ export default function Dashboard() {
                                 <span className="truncate">{status.message}</span>
                             </div>
                         )}
+                        <button
+                            onClick={() => navigate('/checker')}
+                            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest"
+                            title="Open Excel Data Checker"
+                        >
+                            <FileSpreadsheet size={12} /> <span className="hidden sm:inline">DATA CHECKER</span><span className="sm:hidden">CHECKER</span>
+                        </button>
                         {(parseInt(userRole) === 1 || parseInt(userRole) === 2) && (
                             <button
                                 onClick={() => navigate('/admin')}
