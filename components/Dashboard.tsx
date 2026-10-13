@@ -656,10 +656,15 @@ export default function Dashboard() {
                         )}
                         <button
                             onClick={() => navigate('/checker')}
-                            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest"
+                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 bg-white border border-[#1E3A8A] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-[#1E3A8A] hover:text-white transition-all active:scale-97 uppercase tracking-widest shadow-2xs group"
                             title="Open Excel Data Checker"
                         >
-                            <FileSpreadsheet size={12} /> <span className="hidden sm:inline">DATA CHECKER</span><span className="sm:hidden">CHECKER</span>
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#1E3A8A] group-hover:bg-white"></span>
+                            </span>
+                            <FileSpreadsheet size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" />
+                            <span className="hidden sm:inline">DATA CHECKER</span><span className="sm:hidden">CHECKER</span>
                         </button>
                         {(parseInt(userRole) === 1 || parseInt(userRole) === 2) && (
                             <button

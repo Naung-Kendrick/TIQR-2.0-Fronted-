@@ -330,8 +330,12 @@ export default function DataCheckerDashboard() {
             </button>
 
             {/* Active Checker Tab Indicator */}
-            <div className="flex items-center gap-1 px-2.5 py-1.5 bg-black text-white border border-black text-[9px] sm:text-[10px] font-black uppercase tracking-wider">
-              <FileSpreadsheet size={12} />
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-black text-white border border-[#1E3A8A] text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-2xs">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-400"></span>
+              </span>
+              <FileSpreadsheet size={12} className="text-blue-300" />
               <span>DATA CHECKER</span>
             </div>
 
