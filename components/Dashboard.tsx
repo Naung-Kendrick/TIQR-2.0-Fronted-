@@ -120,6 +120,7 @@ export default function Dashboard() {
     const [downloadProgress, setDownloadProgress] = useState(0);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     // Create refs map for QR cards
     const cardRefs = useRef<Map<string | number, React.RefObject<QRCodeCardHandle | null>>>(new Map());
@@ -298,10 +299,7 @@ export default function Dashboard() {
         setTimeout(() => setStatus({ message: '', type: '' }), 3000);
     }, []);
 
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
+    const processUploadedFile = async (file: File) => {
         setIsProcessing(true);
         try {
             const arrayBuffer = await file.arrayBuffer();
@@ -325,14 +323,13 @@ export default function Dashboard() {
                 });
 
                 setHeaders(headersFound);
-                // Simulate processing for Skeleton Loader demonstration
                 setTimeout(() => {
                     setData(rows);
                     setSelectedColumns(headersFound);
                     setSelectedQRColumns(headersFound);
                     setIsProcessing(false);
                     showStatus('Identity records connected. Database Active.', 'success');
-                }, 1500);
+                }, 1000);
             } else {
                 showStatus('File contains no readable data.', 'error');
                 setIsProcessing(false);
@@ -340,6 +337,34 @@ export default function Dashboard() {
         } catch (err) {
             showStatus('Failed to parse file.', 'error');
             setIsProcessing(false);
+        }
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) processUploadedFile(file);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) {
+            const ext = file.name.split('.').pop()?.toLowerCase();
+            if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
+                processUploadedFile(file);
+            } else {
+                showStatus('Please upload an Excel (.xlsx, .xls) or CSV (.csv) file.', 'error');
+            }
         }
     };
 
@@ -655,23 +680,44 @@ export default function Dashboard() {
 
                 {data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-8 sm:py-12 animate-in fade-in duration-700">
-                        <button
+                        <div
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-full max-w-xl bg-white/40 backdrop-blur-sm border-2 border-[#E5E7EB] border-dashed p-6 sm:p-8 flex flex-col items-center justify-center hover:border-black/40 hover:bg-white/60 transition-all duration-200 group active:scale-97 shadow-2xl"
+                            className={`w-full max-w-xl cursor-pointer backdrop-blur-sm border-2 border-dashed p-7 sm:p-10 flex flex-col items-center justify-center transition-all duration-300 group active:scale-[0.99] shadow-xl ${
+                                isDragging
+                                    ? 'border-black bg-white/90 ring-4 ring-black/5 scale-[1.01]'
+                                    : 'border-[#E5E7EB] bg-white/50 hover:border-black/50 hover:bg-white/70 hover:shadow-2xl'
+                            }`}
                         >
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#FAFAFA] text-[#737373] flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-black group-hover:text-white transition-all duration-200 border border-[#E5E7EB]">
-                                {isProcessing ? <Loader2 size={22} className="animate-spin" /> : <Upload size={22} />}
+                            <div className="w-14 h-14 bg-[#FAFAFA] text-[#737373] flex items-center justify-center mb-3.5 group-hover:bg-black group-hover:text-white transition-all duration-300 border border-[#E5E7EB] shadow-2xs group-hover:scale-105">
+                                {isProcessing ? <Loader2 size={24} className="animate-spin" /> : <Upload size={24} className="group-hover:-translate-y-0.5 transition-transform duration-200" />}
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-[#1A1A1A] mb-1.5 uppercase tracking-tight text-center">Import Excel Database</h2>
-                            <p className="text-[#737373] text-[10px] sm:text-xs font-medium mb-4 sm:mb-6 text-center max-w-xs uppercase tracking-wide">ဘိူန်းဟံပ်လိူည် Excel (.xlsx) ကာည်း CSV (.csv)</p>
-                            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-                                <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#FAFAFA] text-[9px] sm:text-[10px] font-bold uppercase text-[#737373] tracking-wider border border-[#E5E7EB]">
+                            <h2 className="text-base sm:text-lg font-bold text-[#1A1A1A] mb-1 uppercase tracking-tight text-center">
+                                Import Excel Database
+                            </h2>
+                            <p className="text-[#737373] text-[10px] sm:text-xs font-medium mb-5 text-center max-w-xs uppercase tracking-wide">
+                                ဘိူန်းဟံပ်လိူည် Excel (.xlsx) ကာည်း CSV (.csv)
+                            </p>
+                            <div className="flex flex-wrap justify-center gap-2 sm:gap-2.5">
+                                <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white text-[9px] sm:text-[10px] font-bold uppercase text-[#1A1A1A] tracking-wider border border-[#E5E7EB] shadow-2xs group-hover:border-black/20">
                                     <FileSpreadsheet size={13} className="text-[#737373]" /> .XLSX Excel
                                 </div>
-                                <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#FAFAFA] text-[9px] sm:text-[10px] font-bold uppercase text-[#737373] tracking-wider border border-[#E5E7EB]">
+                                <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white text-[9px] sm:text-[10px] font-bold uppercase text-[#1A1A1A] tracking-wider border border-[#E5E7EB] shadow-2xs group-hover:border-black/20">
                                     <FileSpreadsheet size={13} className="text-[#737373]" /> .CSV Data
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Direct link to Data Checker */}
+                        <button
+                            type="button"
+                            onClick={() => navigate('/checker')}
+                            className="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/70 hover:bg-black hover:text-white border border-[#E5E7EB] hover:border-black text-[#737373] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all active:scale-97 shadow-2xs"
+                        >
+                            <FileSpreadsheet size={12} />
+                            <span>Verify Data First In Data Checker &rarr;</span>
                         </button>
                     </div>
                 ) : (

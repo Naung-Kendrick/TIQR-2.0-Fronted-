@@ -13,6 +13,10 @@ export const CheckerSummaryCards: React.FC<CheckerSummaryCardsProps> = ({
   activeFilter,
   onSelectFilter
 }) => {
+  const total = summary.totalRecords;
+  const passPct = total > 0 ? `${((summary.validRecords / total) * 100).toFixed(1)}%` : null;
+  const failPct = total > 0 ? `${((summary.recordsWithErrors / total) * 100).toFixed(1)}%` : null;
+
   const cards = [
     {
       id: 'ALL',
@@ -22,6 +26,7 @@ export const CheckerSummaryCards: React.FC<CheckerSummaryCardsProps> = ({
       badge: 'ALL',
       badgeClass: 'bg-[#1A1A1A] text-white',
       borderActive: 'border-[#1A1A1A] ring-1 ring-[#1A1A1A]',
+      pct: total > 0 ? '100%' : null,
     },
     {
       id: 'PASS',
@@ -31,6 +36,7 @@ export const CheckerSummaryCards: React.FC<CheckerSummaryCardsProps> = ({
       badge: 'PASS',
       badgeClass: 'bg-emerald-600 text-white',
       borderActive: 'border-emerald-600 ring-1 ring-emerald-600',
+      pct: passPct,
     },
     {
       id: 'FAIL',
@@ -40,6 +46,7 @@ export const CheckerSummaryCards: React.FC<CheckerSummaryCardsProps> = ({
       badge: 'FAIL',
       badgeClass: 'bg-red-600 text-white',
       borderActive: 'border-red-600 ring-1 ring-red-600',
+      pct: failPct,
     },
   ];
 
@@ -78,9 +85,14 @@ export const CheckerSummaryCards: React.FC<CheckerSummaryCardsProps> = ({
               {card.value.toLocaleString()}
             </div>
 
-            {/* Label */}
-            <div className="text-[11px] font-bold text-[#737373] uppercase tracking-widest border-t border-[#E5E7EB] pt-2">
-              {card.label}
+            {/* Label + Percentage */}
+            <div className="flex items-center justify-between text-[11px] font-bold text-[#737373] uppercase tracking-widest border-t border-[#E5E7EB] pt-2">
+              <span>{card.label}</span>
+              {card.pct && (
+                <span className="font-mono text-[10px] text-[#737373]/80 lowercase">
+                  {card.pct}
+                </span>
+              )}
             </div>
           </button>
         );
