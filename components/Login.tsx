@@ -358,8 +358,8 @@ export function Login() {
                                 <p className="text-[#737373] text-[9px] font-bold uppercase tracking-[0.2em]">
                                     Ta'ang Land Img QR Code Creator
                                 </p>
-                                <p className="text-[#1A1A1A] text-[9px] font-black uppercase tracking-[0.3em] opacity-40">
-                                    VERSION V 3.0.0
+                                <p className="text-blue-600 text-[10px] font-black uppercase tracking-[0.25em]">
+                                    VERSION 3.0.0
                                 </p>
                             </div>
                         </div>
