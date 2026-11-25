@@ -17,7 +17,9 @@ import {
     Users,
     MapPin,
     ChevronDown,
-    Clock
+    Clock,
+    BookA,
+    ArrowRight
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -707,6 +709,14 @@ export default function Dashboard() {
                             <FileSpreadsheet size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" />
                             <span className="hidden sm:inline">DATA CHECKER</span><span className="sm:hidden">CHECKER</span>
                         </button>
+                        <button
+                            onClick={() => navigate('/names')}
+                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-white border border-[#E5E7EB] hover:border-[#1E3A8A] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest group"
+                            title="Open Myanmar–English Name Dictionary & Transliteration System"
+                        >
+                            <BookA size={12} className="text-blue-600 group-hover:text-white transition-colors" />
+                            <span className="hidden sm:inline">NAME DICTIONARY</span><span className="sm:hidden">NAMES</span>
+                        </button>
                         {(parseInt(userRole) === 1 || parseInt(userRole) === 2) && (
                             <button
                                 onClick={() => navigate('/admin')}
@@ -756,14 +766,36 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Direct link to Data Checker */}
+                        {/* Direct link to Data Checker — matches TPS light/sharp theme with high-contrast #1E3A8A accent */}
                         <button
                             type="button"
                             onClick={() => navigate('/checker')}
-                            className="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/70 hover:bg-black hover:text-white border border-[#E5E7EB] hover:border-black text-[#737373] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all active:scale-97 shadow-2xs"
+                            className="mt-4 w-full max-w-xl bg-white/95 hover:bg-white border border-[#1E3A8A] border-l-4 border-l-[#1E3A8A] px-4 py-3 text-left transition-all active:scale-[0.99] shadow-[0_2px_12px_rgba(30,58,138,0.12)] hover:shadow-[0_4px_18px_rgba(30,58,138,0.2)] group"
                         >
-                            <FileSpreadsheet size={12} />
-                            <span>Verify Data First In Data Checker &rarr;</span>
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-9 h-9 shrink-0 bg-[#1E3A8A] text-white flex items-center justify-center group-hover:bg-black transition-colors">
+                                        <FileSpreadsheet size={16} />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="inline-block px-1.5 py-0.5 bg-[#1E3A8A]/10 border border-[#1E3A8A]/30 text-[#1E3A8A] text-[8px] sm:text-[9px] font-black uppercase tracking-widest shrink-0">
+                                                1st Step
+                                            </span>
+                                            <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#1A1A1A] truncate">
+                                                Verify Data First In Data Checker
+                                            </p>
+                                        </div>
+                                        <p className="text-[10px] text-[#737373] font-medium truncate mt-0.5">
+                                            Check columns, duplicates &amp; formatting before importing
+                                        </p>
+                                    </div>
+                                </div>
+                                <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E3A8A] group-hover:bg-black text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors">
+                                    <span>OPEN</span>
+                                    <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                                </span>
+                            </div>
                         </button>
                     </div>
                 ) : (
