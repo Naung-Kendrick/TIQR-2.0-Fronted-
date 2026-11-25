@@ -155,16 +155,18 @@ export const QRCodeCard = forwardRef<QRCodeCardHandle, QRCodeCardProps>(
                     <div ref={qrRef} className="bg-white p-1 border border-[#E5E7EB] relative z-10">
                         <QRCodeCanvas
                             value={qrValue || "NO_DATA"}
-                            size={100}
+                            size={600}
                             level="M"
                             includeMargin={true}
+                            style={{ width: '100px', height: '100px' }}
                             imageSettings={{
                                 src: logo,
-                                height: 24,
-                                width: 24,
+                                height: 144,
+                                width: 144,
                                 excavate: true,
                             }}
-                            fgColor="#0f172a"
+                            fgColor="#000000"
+                            bgColor="#FFFFFF"
                         />
                     </div>
                 </div>
