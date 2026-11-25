@@ -93,7 +93,29 @@ export function LoadingModal({ isVisible, status }: LoadingModalProps) {
                     >
                         <div className="bg-white border border-[#E5E7EB] shadow-2xl p-8 text-center relative">
                             {/* Top accent line */}
-                            <div className="absolute top-0 left-0 right-0 h-[2px] bg-black" />
+                            <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#1E3A8A]" />
+
+                            {/* Header Logo & Text */}
+                            <div className="mb-6 pb-4 border-b border-[#1E3A8A]/20 flex flex-col items-center gap-2.5">
+                                <motion.img
+                                    src="/iLovePDF2-bg-removed.png"
+                                    alt="Ta'ang Land Immigration Logo"
+                                    className="w-12 h-12 object-contain select-none"
+                                    animate={{
+                                        x: [0, 8, 0, -8, 0],
+                                        y: [0, -4, 0, 4, 0],
+                                        rotate: [0, 4, 0, -4, 0],
+                                    }}
+                                    transition={{
+                                        duration: 4.5,
+                                        repeat: Infinity,
+                                        ease: 'easeInOut',
+                                    }}
+                                />
+                                <p className="text-[#1E3A8A] font-black text-[11px] sm:text-xs uppercase tracking-[0.22em]">
+                                    TA&apos;ANG LAND IMMIGRATION
+                                </p>
+                            </div>
 
                             {/* Rotating Ring with Centered Red Seconds */}
                             <div className="flex justify-center mb-6">
