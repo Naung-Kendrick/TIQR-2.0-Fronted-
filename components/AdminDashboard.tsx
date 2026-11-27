@@ -20,7 +20,8 @@ import {
     TrendingUp,
     WrenchIcon,
     X,
-    FileSpreadsheet
+    FileSpreadsheet,
+    BookA
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserRole, StatusState } from '../types';
@@ -344,6 +345,13 @@ export default function AdminDashboard() {
                             title="Open Excel Data Checker"
                         >
                             <FileSpreadsheet size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" /> Data Checker
+                        </button>
+                        <button
+                            onClick={() => navigate('/names')}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] hover:border-[#1E3A8A] text-[#1A1A1A] text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest group"
+                            title="Open Myanmar–English Name Dictionary & Transliteration System"
+                        >
+                            <BookA size={12} className="text-blue-600 group-hover:text-white transition-colors" /> Name Dictionary
                         </button>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black uppercase tracking-widest">
                             <Shield size={12} />

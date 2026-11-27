@@ -5,6 +5,7 @@ import { Register } from './components/Register';
 import Dashboard from './components/Dashboard';
 import AdminDashboard from './components/AdminDashboard';
 import DataCheckerDashboard from './components/DataChecker/DataCheckerDashboard';
+import NameDictionaryDashboard from './components/NameDictionary/NameDictionaryDashboard';
 import { UserRole } from './types';
 
 
@@ -51,6 +52,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <DataCheckerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/names"
+          element={
+            <ProtectedRoute>
+              <NameDictionaryDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dictionary"
+          element={
+            <ProtectedRoute>
+              <NameDictionaryDashboard />
             </ProtectedRoute>
           }
         />

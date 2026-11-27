@@ -100,22 +100,6 @@ input:-webkit-autofill:focus {
   background: var(--n-text-2);
 }
 
-/* ─── Utility: Mono font for tabular data ───────────────────────────────── */
-.font-mono-data {
-  font-family: 'JetBrains Mono', monospace;
-}
-
-/* ─── Glass panel (kept for compatibility, now flat) ────────────────────── */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid var(--n-border);
-}
-
-/* ─── Float animation removed — replaced by static presence ─────────────── */
-.float-animation {
-  animation: none;
-}
-
 /* ─── Slide-up for bottom bars ──────────────────────────────────────────── */
 @keyframes slideUp {
   from { transform: translateY(100%); opacity: 0; }
