@@ -550,7 +550,7 @@ export default function Dashboard() {
                         <div className="relative" ref={onlineDropdownRef}>
                             <button
                                 onClick={() => setShowOnlineDropdown(!showOnlineDropdown)}
-                                className="h-8 flex items-center gap-1 sm:gap-1.5 px-2.5 border border-[#D1D5DB] bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#1A1A1A] transition-all duration-150 active:scale-95 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]"
+                                className="h-8 flex items-center gap-1 sm:gap-1.5 px-2.5 bg-white border border-[#E5E7EB] hover:bg-[#F3F4F6] text-[#1A1A1A] transition-all active:scale-97"
                             >
                                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                                 <Users size={11} className="text-[#1A1A1A]" />

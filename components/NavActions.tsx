@@ -8,10 +8,8 @@ interface NavActionsProps {
 }
 
 /**
- * Unified top-right navigation — segmented control style.
- * Active tab: navy fill + white text + bottom indicator bar.
- * Inactive tabs: ghost inside a shared tray; hover → navy tint.
- * Logout sits outside the tray as a danger ghost button.
+ * Unified top-right navigation bar across TIQR Creator, Data Checker, and Name Dictionary.
+ * Keeps tab order, heights, and active states consistent so buttons never shift across pages.
  */
 export function NavActions({ onLogout }: NavActionsProps) {
   const navigate = useNavigate();
@@ -22,12 +20,15 @@ export function NavActions({ onLogout }: NavActionsProps) {
   const isAdmin = roleNum === UserRole.ROOT_ADMIN || roleNum === UserRole.ADMIN;
 
   const isDashboard = pathname === '/dashboard';
-  const isChecker  = pathname === '/checker';
-  const isNames    = pathname === '/names' || pathname === '/dictionary';
+  const isChecker = pathname === '/checker';
+  const isNames = pathname === '/names' || pathname === '/dictionary';
   const isAdminPage = pathname === '/admin';
 
   const handleLogout = () => {
-    if (onLogout) { onLogout(); return; }
+    if (onLogout) {
+      onLogout();
+      return;
+    }
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_login_time');
     localStorage.removeItem('auth_role');
@@ -36,118 +37,74 @@ export function NavActions({ onLogout }: NavActionsProps) {
     navigate('/');
   };
 
-  /* ── shared sizing ── */
-  const tabBase =
-    'relative h-8 inline-flex items-center gap-1 xl:gap-1.5 px-2 xl:px-3 text-[9px] font-black uppercase tracking-wider transition-all duration-150 whitespace-nowrap shrink-0 select-none focus-visible:outline-none';
-
-  const activeTab =
-    'bg-[#1E3A8A] text-white z-10';
-
-  const inactiveTab =
-    'bg-transparent text-[#555] hover:bg-[#1E3A8A]/10 hover:text-[#1E3A8A] active:bg-[#1E3A8A]/20';
-
-  /* bottom indicator bar on active tab */
-  const activeIndicator =
-    'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-white/60 after:content-[""]';
+  const baseBtn =
+    'h-8 inline-flex items-center gap-1.5 px-2.5 border text-[9px] font-black uppercase tracking-wider transition-all active:scale-97 whitespace-nowrap shrink-0';
+  const activeBtn =
+    'bg-[#1E3A8A] border-[#1E3A8A] text-white cursor-default shadow-[0_2px_8px_rgba(30,58,138,0.22)]';
+  const inactiveBtn =
+    'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:border-black hover:bg-black hover:text-white group';
 
   return (
-    <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
-
-      {/* ── Segmented Nav Tray ── */}
-      <nav
-        aria-label="Main navigation"
-        className="
-          flex items-center
-          border border-[#D1D5DB]
-          bg-[#F3F4F6]
-          shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]
-          divide-x divide-[#D1D5DB]
-          overflow-hidden
-        "
+    <>
+      <button
+        type="button"
+        onClick={() => !isDashboard && navigate('/dashboard')}
+        aria-current={isDashboard ? 'page' : undefined}
+        className={`${baseBtn} ${isDashboard ? activeBtn : inactiveBtn}`}
+        title="TIQR QR Code Creator"
       >
-        {/* TIQR CREATOR */}
+        <QrCode size={12} className={isDashboard ? 'text-white' : 'text-[#1E3A8A] group-hover:text-white transition-colors'} />
+        <span className="hidden sm:inline">TIQR CREATOR</span>
+        <span className="sm:hidden">TIQR</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => !isChecker && navigate('/checker')}
+        aria-current={isChecker ? 'page' : undefined}
+        className={`${baseBtn} ${isChecker ? activeBtn : inactiveBtn}`}
+        title="Excel Data Checker"
+      >
+        <FileSpreadsheet size={12} className={isChecker ? 'text-white' : 'text-[#1E3A8A] group-hover:text-white transition-colors'} />
+        <span className="hidden sm:inline">DATA CHECKER</span>
+        <span className="sm:hidden">CHECKER</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => !isNames && navigate('/names')}
+        aria-current={isNames ? 'page' : undefined}
+        className={`${baseBtn} ${isNames ? activeBtn : inactiveBtn}`}
+        title="Myanmar–English Name Dictionary & Transliteration"
+      >
+        <BookA size={12} className={isNames ? 'text-white' : 'text-[#1E3A8A] group-hover:text-white transition-colors'} />
+        <span className="hidden sm:inline">NAME DICTIONARY</span>
+        <span className="sm:hidden">NAMES</span>
+      </button>
+
+      {isAdmin && (
         <button
           type="button"
-          onClick={() => !isDashboard && navigate('/dashboard')}
-          aria-current={isDashboard ? 'page' : undefined}
-          title="TIQR QR Code Creator"
-          className={`${tabBase} ${isDashboard ? `${activeTab} ${activeIndicator}` : inactiveTab}`}
+          onClick={() => !isAdminPage && navigate('/admin')}
+          aria-current={isAdminPage ? 'page' : undefined}
+          className={`${baseBtn} ${isAdminPage ? activeBtn : inactiveBtn}`}
+          title="System Administration"
         >
-          <QrCode
-            size={11}
-            className={isDashboard ? 'text-white/90' : 'text-[#1E3A8A]'}
-          />
-          <span className="hidden sm:inline">TIQR CREATOR</span>
-          <span className="sm:hidden">TIQR</span>
+          <ShieldCheck size={12} />
+          <span className="hidden sm:inline">ADMIN</span>
+          <span className="sm:hidden">ADM</span>
         </button>
+      )}
 
-        {/* DATA CHECKER */}
-        <button
-          type="button"
-          onClick={() => !isChecker && navigate('/checker')}
-          aria-current={isChecker ? 'page' : undefined}
-          title="Excel Data Checker"
-          className={`${tabBase} ${isChecker ? `${activeTab} ${activeIndicator}` : inactiveTab}`}
-        >
-          <FileSpreadsheet
-            size={11}
-            className={isChecker ? 'text-white/90' : 'text-[#1E3A8A]'}
-          />
-          <span className="hidden sm:inline">DATA CHECKER</span>
-          <span className="sm:hidden">CHECK</span>
-        </button>
-
-        {/* NAME DICTIONARY */}
-        <button
-          type="button"
-          onClick={() => !isNames && navigate('/names')}
-          aria-current={isNames ? 'page' : undefined}
-          title="Myanmar–English Name Dictionary"
-          className={`${tabBase} ${isNames ? `${activeTab} ${activeIndicator}` : inactiveTab}`}
-        >
-          <BookA
-            size={11}
-            className={isNames ? 'text-white/90' : 'text-[#1E3A8A]'}
-          />
-          <span className="hidden sm:inline">NAME DICTIONARY</span>
-          <span className="sm:hidden">NAMES</span>
-        </button>
-
-        {/* ADMIN — only for admins */}
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={() => !isAdminPage && navigate('/admin')}
-            aria-current={isAdminPage ? 'page' : undefined}
-            title="System Administration"
-            className={`${tabBase} ${isAdminPage ? `${activeTab} ${activeIndicator}` : inactiveTab}`}
-          >
-            <ShieldCheck
-              size={11}
-              className={isAdminPage ? 'text-white/90' : 'text-[#1E3A8A]'}
-            />
-            <span className="hidden sm:inline">ADMIN</span>
-            <span className="sm:hidden">ADM</span>
-          </button>
-        )}
-      </nav>
-
-      {/* ── Logout — outside the tray, danger ghost ── */}
       <button
         type="button"
         onClick={handleLogout}
-        title="Sign out"
-        className="
-          h-8 inline-flex items-center gap-1 xl:gap-1.5 px-2 xl:px-2.5
-          border border-[#E5E7EB] bg-white
-          text-[9px] font-black uppercase tracking-wider text-[#9CA3AF]
-          hover:border-red-300 hover:bg-red-50 hover:text-red-600
-          active:scale-95 transition-all duration-150 whitespace-nowrap shrink-0
-        "
+        className="h-8 inline-flex items-center gap-1.5 px-2.5 bg-white border border-[#E5E7EB] text-[#737373] text-[9px] font-black hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all active:scale-97 uppercase tracking-wider whitespace-nowrap shrink-0"
+        title="Logout"
       >
-        <LogOut size={11} />
+        <LogOut size={12} />
         <span className="hidden sm:inline">LOGOUT</span>
       </button>
-    </div>
+    </>
   );
 }
