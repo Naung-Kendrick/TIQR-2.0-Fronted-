@@ -339,20 +339,23 @@ export default function AdminDashboard() {
                             <WrenchIcon size={12} />
                             {maintenanceMode ? 'Maintenance: ON' : 'Maintenance'}
                         </button>
-                        <button
-                            onClick={() => navigate('/checker')}
-                            className="h-8 flex items-center gap-1.5 px-3 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black hover:bg-black hover:border-black hover:text-white transition-all active:scale-97 uppercase tracking-widest group"
-                            title="Open Excel Data Checker"
-                        >
-                            <FileSpreadsheet size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" /> Data Checker
-                        </button>
-                        <button
-                            onClick={() => navigate('/names')}
-                            className="h-8 flex items-center gap-1.5 px-3 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black hover:bg-black hover:border-black hover:text-white transition-all active:scale-97 uppercase tracking-widest group"
-                            title="Open Myanmar–English Name Dictionary & Transliteration System"
-                        >
-                            <BookA size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" /> Name Dictionary
-                        </button>
+                        {/* Quick-nav tray matching NavActions segmented style */}
+                        <nav className="flex items-center border border-[#D1D5DB] bg-[#F3F4F6] shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] divide-x divide-[#D1D5DB] overflow-hidden">
+                            <button
+                                onClick={() => navigate('/checker')}
+                                className="h-8 inline-flex items-center gap-1.5 px-3 text-[9px] font-black uppercase tracking-wider text-[#555] hover:bg-[#1E3A8A]/10 hover:text-[#1E3A8A] transition-all duration-150 whitespace-nowrap"
+                                title="Open Excel Data Checker"
+                            >
+                                <FileSpreadsheet size={11} className="text-[#1E3A8A]" /> Data Checker
+                            </button>
+                            <button
+                                onClick={() => navigate('/names')}
+                                className="h-8 inline-flex items-center gap-1.5 px-3 text-[9px] font-black uppercase tracking-wider text-[#555] hover:bg-[#1E3A8A]/10 hover:text-[#1E3A8A] transition-all duration-150 whitespace-nowrap"
+                                title="Open Myanmar–English Name Dictionary & Transliteration System"
+                            >
+                                <BookA size={11} className="text-[#1E3A8A]" /> Name Dictionary
+                            </button>
+                        </nav>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[10px] font-black uppercase tracking-widest">
                             <Shield size={12} />
                             {getRoleName(currentUserRole)}
