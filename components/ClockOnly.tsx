@@ -47,9 +47,9 @@ export function ClockOnly({ compact = false }: ClockOnlyProps) {
   }
 
   return (
-    <div className="group flex items-center gap-3 px-3.5 py-1.5 bg-white/80 hover:bg-white backdrop-blur-md border border-[#E5E7EB] hover:border-blue-500/40 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_12px_rgba(37,99,235,0.08)] transition-all duration-300">
-      <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
-        <svg className="w-9 h-9 -rotate-90 transform" viewBox="0 0 36 36">
+    <div className="group flex items-center gap-2.5 px-2.5 py-1 bg-white/80 hover:bg-white backdrop-blur-md border border-[#E5E7EB] hover:border-blue-500/40 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_12px_rgba(37,99,235,0.08)] transition-all duration-300 shrink-0">
+      <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+        <svg className="w-8 h-8 -rotate-90 transform" viewBox="0 0 36 36">
           <circle
             cx="18"
             cy="18"

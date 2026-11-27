@@ -9,7 +9,6 @@ import {
     FileSpreadsheet,
     Download,
     Loader2,
-    LogOut,
     CheckSquare,
     Square,
     X,
@@ -18,7 +17,6 @@ import {
     MapPin,
     ChevronDown,
     Clock,
-    BookA,
     ArrowRight
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -30,6 +28,7 @@ import { DataRow, StatusState, OnlineUser } from '../types';
 import { makeApiUrl } from '../api/config';
 import { ShaderAnimation } from './ui/shader-animation';
 import { ClockOnly } from './ClockOnly';
+import { NavActions } from './NavActions';
 
 const DEFAULT_LOGO_URL = "/iLovePDF2-bg-removed.png";
 
@@ -49,8 +48,6 @@ const formatTimeAgo = (dateString: string) => {
 };
 
 export default function Dashboard() {
-    const userRole = localStorage.getItem('auth_role') || 'admin';
-
     const [data, setData] = useState<DataRow[]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
@@ -244,14 +241,6 @@ export default function Dashboard() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-
-    const handleLogout = () => {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_login_time');
-        localStorage.removeItem('auth_role');
-        localStorage.removeItem('user_name');
-        navigate('/');
-    };
 
     const showStatus = useCallback((message: string, type: 'success' | 'error') => {
         setStatus({ message, type });
@@ -518,45 +507,50 @@ export default function Dashboard() {
 
             <div className="h-full overflow-y-auto custom-scrollbar max-w-[1600px] mx-auto px-3 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 relative z-10">
                 {/* Header */}
-                <header className="mb-4 pb-3 border-b border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    {/* Row 1: Logo + Title + Clock */}
-                    <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
-                        <div className="flex items-center gap-2 min-w-0">
-                            <img src={logo} className="w-9 h-9 sm:w-12 sm:h-12 object-contain shrink-0" alt="Logo" />
-                            <div className="min-w-0">
-                                <h1 className="text-sm sm:text-base font-bold text-[#1A1A1A] tracking-tight uppercase leading-tight">
-                                    တီုင်စေတ်မေန်းတိုအီး <span className="text-[#737373] hidden sm:inline">[TIQR CREATOR]</span><span className="text-[#737373] sm:hidden">[TIQR]</span>
-                                    <span className="ml-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 bg-white text-[#1A1A1A] text-[7px] sm:text-[8px] font-black border border-[#E5E7EB] uppercase tracking-wider align-middle">
+                <header className="mb-4 pb-3 border-b border-[#E5E7EB] flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+                    {/* Row 1: Logo + Title + Compact Clock (below 2xl) */}
+                    <div className="flex items-center justify-between gap-3 shrink-0">
+                        <div className="flex items-center gap-2.5 shrink-0">
+                            <img src={logo} className="w-9 h-9 sm:w-10 sm:h-10 object-contain shrink-0" alt="Logo" />
+                            <div className="shrink-0">
+                                <div className="flex items-center gap-1.5 flex-nowrap">
+                                    <h1 className="text-xs sm:text-sm font-bold text-[#1A1A1A] tracking-tight uppercase leading-tight whitespace-nowrap">
+                                        တီုင်စေတ်မေန်းတိုအီး <span className="text-[#737373] hidden sm:inline">[TIQR CREATOR]</span><span className="text-[#737373] sm:hidden">[TIQR]</span>
+                                    </h1>
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white text-[#1A1A1A] text-[7px] sm:text-[8px] font-black border border-[#E5E7EB] uppercase tracking-wider shrink-0 whitespace-nowrap">
                                         <span className="relative flex h-1.5 w-1.5">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#1E3A8A]"></span>
                                         </span>
                                         V 3.0.0
                                     </span>
-                                </h1>
-                                <p className="text-[#737373] text-[8px] font-bold hidden sm:flex items-center gap-1.5 mt-0.5 uppercase tracking-wider">
+                                </div>
+                                <p className="text-[#737373] text-[8px] font-bold hidden sm:flex items-center gap-1.5 mt-0.5 uppercase tracking-wider whitespace-nowrap">
                                     <ShieldCheck size={9} className="text-[#737373] shrink-0" /> powered By <span style={{ color: '#1E3A8A' }}>Mai Naung Naung &amp; Mai Nay Lin</span>
                                 </p>
                             </div>
                         </div>
-                        {/* Compact clock — mobile only */}
-                        <div className="sm:hidden shrink-0">
+                        {/* Compact clock — mobile & tablet (<1280px) */}
+                        <div className="xl:hidden shrink-0">
                             <ClockOnly compact />
                         </div>
                     </div>
 
-                    {/* Center: Full Clock — desktop only */}
-                    <div className="hidden sm:block">
+                    {/* Center: Compact Clock on 1280px–1535px, Full Clock on >=1536px */}
+                    <div className="hidden xl:block 2xl:hidden shrink-0">
+                        <ClockOnly compact />
+                    </div>
+                    <div className="hidden 2xl:block shrink-0">
                         <ClockOnly />
                     </div>
 
-                    {/* Row 2 on mobile / right side on desktop: action buttons */}
-                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                    {/* Row 2 on <1280px / Right side on >=1280px: action buttons */}
+                    <div className="flex items-center gap-1.5 flex-wrap xl:flex-nowrap justify-start xl:justify-end">
                         {/* Who's Online */}
                         <div className="relative" ref={onlineDropdownRef}>
                             <button
                                 onClick={() => setShowOnlineDropdown(!showOnlineDropdown)}
-                                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 bg-white border border-[#E5E7EB] hover:bg-[#F3F4F6] text-[#1A1A1A] transition-all active:scale-97"
+                                className="h-8 flex items-center gap-1 sm:gap-1.5 px-2.5 bg-white border border-[#E5E7EB] hover:bg-[#F3F4F6] text-[#1A1A1A] transition-all active:scale-97"
                             >
                                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                                 <Users size={11} className="text-[#1A1A1A]" />
@@ -613,36 +607,7 @@ export default function Dashboard() {
                                 <span className="truncate">{status.message}</span>
                             </div>
                         )}
-                        <button
-                            onClick={() => navigate('/checker')}
-                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-white border border-[#1E3A8A] ring-1 ring-[#1E3A8A]/50 text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-[#1E3A8A] hover:text-white transition-all active:scale-97 uppercase tracking-widest shadow-[0_0_8px_rgba(30,58,138,0.25)] group"
-                            title="Open Excel Data Checker"
-                        >
-                            <FileSpreadsheet size={12} className="text-[#1E3A8A] group-hover:text-white transition-colors" />
-                            <span className="hidden sm:inline">DATA CHECKER</span><span className="sm:hidden">CHECKER</span>
-                        </button>
-                        <button
-                            onClick={() => navigate('/names')}
-                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 bg-white border border-[#E5E7EB] hover:border-[#1E3A8A] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest group"
-                            title="Open Myanmar–English Name Dictionary & Transliteration System"
-                        >
-                            <BookA size={12} className="text-blue-600 group-hover:text-white transition-colors" />
-                            <span className="hidden sm:inline">NAME DICTIONARY</span><span className="sm:hidden">NAMES</span>
-                        </button>
-                        {(parseInt(userRole) === 1 || parseInt(userRole) === 2) && (
-                            <button
-                                onClick={() => navigate('/admin')}
-                                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-widest"
-                            >
-                                <ShieldCheck size={12} /> <span className="hidden sm:inline">ADMIN</span><span className="sm:hidden">ADM</span>
-                            </button>
-                        )}
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#737373] text-[9px] sm:text-[10px] font-black hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all active:scale-97 uppercase tracking-widest"
-                        >
-                            <LogOut size={12} /> <span className="hidden sm:inline">LOGOUT</span>
-                        </button>
+                        <NavActions />
                     </div>
                 </header>
 

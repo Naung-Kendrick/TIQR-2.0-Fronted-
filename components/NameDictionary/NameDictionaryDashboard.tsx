@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   BookA,
   Languages,
-  FileSpreadsheet,
   ShieldCheck,
-  QrCode,
-  LogOut,
   Sparkles,
   Sliders,
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
 import { ClockOnly } from '../ClockOnly';
+import { NavActions } from '../NavActions';
 
 import {
   DictionaryEntry,
@@ -36,8 +33,6 @@ import { UserRole } from '../../types';
 const DEFAULT_LOGO_URL = '/iLovePDF2-bg-removed.png';
 
 export default function NameDictionaryDashboard() {
-  const navigate = useNavigate();
-
   // Transliteration State
   const [inputMyanmar, setInputMyanmar] = useState('မအေး');
   const [dictionary, setDictionary] = useState<DictionaryEntry[]>([]);
@@ -128,15 +123,6 @@ export default function NameDictionaryDashboard() {
     showStatus('စည်းမျဉ်း သတ်မှတ်ချက်များကို မွမ်းမံပြီးပါပြီ', 'success');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_login_time');
-    localStorage.removeItem('auth_role');
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('auth_name');
-    navigate('/');
-  };
-
   return (
     <div className="min-h-screen text-[#1A1A1A] font-sans selection:bg-black/10 relative tps-page-enter bg-transparent pb-12">
       {/* TLG Seal Watermark Background */}
@@ -154,28 +140,30 @@ export default function NameDictionaryDashboard() {
 
       <div className="max-w-[1600px] mx-auto px-3 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 relative z-10 space-y-4 sm:space-y-5">
         {/* Top Header */}
-        <header className="pb-3 border-b border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <header className="pb-3 border-b border-[#E5E7EB] flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
           {/* Logo & Title */}
-          <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
-            <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center justify-between gap-3 shrink-0">
+            <div className="flex items-center gap-2.5 shrink-0">
               <img
                 src={DEFAULT_LOGO_URL}
-                className="w-9 h-9 sm:w-11 sm:h-11 object-contain shrink-0"
+                className="w-9 h-9 sm:w-10 sm:h-10 object-contain shrink-0"
                 alt="IDTL Logo"
               />
-              <div className="min-w-0">
-                <h1 className="text-sm sm:text-base font-bold text-[#1A1A1A] tracking-tight uppercase leading-tight">
-                  တီုင်စေတ်မေန်းတိုအီး <span className="text-[#737373] hidden sm:inline">[NAME DICTIONARY]</span>
-                  <span className="text-[#737373] sm:hidden">[NAMES]</span>
-                  <span className="ml-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 bg-white text-[#1A1A1A] text-[7px] sm:text-[8px] font-black border border-[#E5E7EB] uppercase tracking-wider align-middle">
+              <div className="shrink-0">
+                <div className="flex items-center gap-1.5 flex-nowrap">
+                  <h1 className="text-xs sm:text-sm font-bold text-[#1A1A1A] tracking-tight uppercase leading-tight whitespace-nowrap">
+                    တီုင်စေတ်မေန်းတိုအီး <span className="text-[#737373] hidden sm:inline">[NAME DICTIONARY]</span>
+                    <span className="text-[#737373] sm:hidden">[NAMES]</span>
+                  </h1>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white text-[#1A1A1A] text-[7px] sm:text-[8px] font-black border border-[#E5E7EB] uppercase tracking-wider shrink-0 whitespace-nowrap">
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#1E3A8A]"></span>
                     </span>
                     V 3.0.0
                   </span>
-                </h1>
-                <p className="text-[#737373] text-[8px] font-bold hidden sm:flex items-center gap-1.5 mt-0.5 uppercase tracking-wider">
+                </div>
+                <p className="text-[#737373] text-[8px] font-bold hidden sm:flex items-center gap-1.5 mt-0.5 uppercase tracking-wider whitespace-nowrap">
                   <ShieldCheck size={10} className="text-[#737373] shrink-0" />
                   powered By
                   <span style={{ color: '#1E3A8A' }}>Mai Naung Naung &amp; Mai Nay Lin</span>
@@ -183,18 +171,21 @@ export default function NameDictionaryDashboard() {
               </div>
             </div>
 
-            <div className="sm:hidden shrink-0">
+            <div className="xl:hidden shrink-0">
               <ClockOnly compact />
             </div>
           </div>
 
           {/* Center Clock */}
-          <div className="hidden sm:block">
+          <div className="hidden xl:block 2xl:hidden shrink-0">
+            <ClockOnly compact />
+          </div>
+          <div className="hidden 2xl:block shrink-0">
             <ClockOnly />
           </div>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap xl:flex-nowrap justify-start xl:justify-end">
             {/* Status Notification */}
             {status && (
               <div
@@ -213,54 +204,7 @@ export default function NameDictionaryDashboard() {
               </div>
             )}
 
-            {/* TIQR Creator Link */}
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-wider"
-              title="Return to TIQR Creator"
-            >
-              <QrCode size={12} />
-              <span className="hidden sm:inline">TIQR CREATOR</span>
-              <span className="sm:hidden">TIQR</span>
-            </button>
-
-            {/* Data Checker Link */}
-            <button
-              onClick={() => navigate('/checker')}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-[#1E3A8A] hover:text-white transition-all active:scale-97 uppercase tracking-wider"
-              title="Open Data Checker"
-            >
-              <FileSpreadsheet size={12} />
-              <span className="hidden sm:inline">DATA CHECKER</span>
-              <span className="sm:hidden">CHECKER</span>
-            </button>
-
-            {/* Active Name Dictionary Indicator */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-black text-white border border-[#1E3A8A] ring-1 ring-[#1E3A8A]/50 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-[0_0_8px_rgba(30,58,138,0.35)]">
-              <BookA size={12} className="text-blue-300" />
-              <span>NAME DICTIONARY</span>
-            </div>
-
-            {/* Admin Link if authorized */}
-            {isAdmin && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-[#E5E7EB] text-[#1A1A1A] text-[9px] sm:text-[10px] font-black hover:bg-black hover:text-white transition-all active:scale-97 uppercase tracking-wider"
-              >
-                <ShieldCheck size={12} />
-                <span className="hidden sm:inline">ADMIN</span>
-                <span className="sm:hidden">ADM</span>
-              </button>
-            )}
-
-            {/* Logout */}
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-[#E5E7EB] text-[#737373] text-[9px] sm:text-[10px] font-black hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all active:scale-97 uppercase tracking-wider"
-            >
-              <LogOut size={12} />
-              <span className="hidden sm:inline">LOGOUT</span>
-            </button>
+            <NavActions />
           </div>
         </header>
 
